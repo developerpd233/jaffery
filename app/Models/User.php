@@ -32,7 +32,7 @@ class User extends \TCG\Voyager\Models\User
         'state_id',
         'city_id',
         'trophies',
-        'profesion_id',
+        'profession_id',
         'date_of_birth',
         'bio',
         'facebook',
@@ -41,6 +41,9 @@ class User extends \TCG\Voyager\Models\User
         'instagram',
         'provider', 
         'provider_id',
+        'forgot_otp',
+        'forgot_expiry_time',
+        'otp_token'
     ];
 
     /**
@@ -75,6 +78,11 @@ class User extends \TCG\Voyager\Models\User
     public function city()
     {
         return $this->belongsTo('App\Models\City');
+    }
+
+    public function profession()
+    {
+        return $this->belongsTo('App\Models\Profession');
     }
 
     public function transactions()
