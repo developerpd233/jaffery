@@ -30,8 +30,9 @@ Route::get('v1/search', 'App\Http\Controllers\Api\V1\Admin\HomeApiController@sea
 Route::get('v1/home/contests', 'App\Http\Controllers\Api\V1\Admin\HomeApiController@contests');
 
 // Contests
-Route::get('v1/contests/type', 'App\Http\Controllers\Api\V1\Admin\HomeApiController@contestsList');
-Route::get('v1/home/contests', 'App\Http\Controllers\Api\V1\Admin\HomeApiController@contests');
+Route::get('v1/contests-by-type/{type}', 'App\Http\Controllers\Api\V1\Admin\ContestApiController@index');
+Route::get('v1/single-contest/{id}', 'App\Http\Controllers\Api\V1\Admin\ContestApiController@show');
+Route::get('v1/contest-search', 'App\Http\Controllers\Api\V1\Admin\ContestApiController@search');
 
 // Page
 Route::get('v1/page/{slug}', 'ContentPageApiController@pageShow');
@@ -51,16 +52,4 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Control
 
     // Vote
     Route::apiResource('votes', 'VoteApiController');
-
-    // Roles
-    Route::apiResource('roles', 'RolesApiController');
-
-    // Contests
-    Route::apiResource('contests', 'ContestApiController');
-
-    // Listings
-    Route::apiResource('listings', 'ListApiController');
-
-    // Home
-    Route::apiResource('home', 'HomeApiController');
 });
