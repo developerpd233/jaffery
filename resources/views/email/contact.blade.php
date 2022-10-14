@@ -14,14 +14,8 @@
 <h3>Phone:</h3>
 <p>{{$user['phone']}}</p>
 <br/>
-<h3>Company:</h3>
-<p>{{$user['company']}}</p>
-<br/>
 <h3>Country:</h3>
 <p>{{$user['country']}}</p>
-<br/>
-<h3>Website:</h3>
-<p><a href="{{$user['website']}}"></a>{{$user['website']}}</p>
 <br/>
 <h3>Description:</h3>
 <p>{{$user['description']}}</p>

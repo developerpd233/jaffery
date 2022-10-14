@@ -40,28 +40,13 @@ if(!function_exists('featuredRecords')) {
 
 	function featuredRecords($contest_id){
 
-		$feature_ids = Illuminate\Support\Facades\DB::table('votes')
-             ->select(Illuminate\Support\Facades\DB::raw('count(*) as vote_count, participant_id'))
-             ->where('contest_id', '=', $contest_id)
-             ->groupBy('participant_id')
-             ->orderByDesc('vote_count')
-             ->pluck('participant_id')
-             ->take(5)->toArray();
-
-             //dd($feature_ids);
-
-        if (count($feature_ids) > 0) {
-        	$tempStr = implode(',', $feature_ids);
-	        $features = App\Models\Participant::whereIn('id', $feature_ids)
-	        			->where('status', 1)
-	        			->orderByRaw(Illuminate\Support\Facades\DB::raw("FIELD(id, $tempStr)"))
-	        			->take(5)
-	        			->get();
-        } else {
-        	$features = collect([]);
-        }
+		$features = App\Models\Participant::withCount('votes')
+            ->where('contest_id', $contest_id)
+			->where('status', 1)
+            ->orderByDesc('votes_count')
+			->take(5)
+            ->get();
         
-        // dd($features);
 		return $features;
 	}
 }

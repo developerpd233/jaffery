@@ -35,7 +35,7 @@
                     </div>
                     <div class="circle">
                         <a href="{{ url('users/').'/'.$participant->user->id }}"><img src="{{ Voyager::image($participant->user->avatar) }}"></a>
-                        <h5>{{$participant->name}}<br>{{$key+1}}th Positon, {{$participant->votes->count()}} Votes</h5>
+                        <h5>{{$participant->name}}<br>1st Positon, {{$participant->votes->count()}} Votes</h5>
                     </div>
                 </div>
         @endforeach

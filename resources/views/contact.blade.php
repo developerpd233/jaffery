@@ -24,10 +24,6 @@
 					<input type="email"  name="email" required>
 				</div>
 				<div class="cntct-fields">
-					<label>Company Name*</label>
-					<input type="name" name="company" required>
-				</div>
-				<div class="cntct-fields">
 					<label>Country*</label>
 					<input type="name" name="country" required>
 				</div>
@@ -41,15 +37,6 @@
 					<label>Phone Number*</label>
 					<input type="text" name="phone" required>
 				</div>
-				<div class="cntct-fields">
-					<label>Company Website*</label>
-					<input type="url" name="website" required>
-				</div>
-				<!-- <div class="cntct-fields">
-					<label>Company Website</label>
-					<input type="name" name="name">
-				</div> -->
-				
 			</div>
 			<div class="cntct-fields msg">
 				<label>Description</label>

@@ -684,67 +684,36 @@ class ParticipantController extends Controller
 
     public function contestants()
     {
-        // $status = Participant::where('status', '=', '1')->get();
-        
-        // // foreach ($participants as $key => $participant) {
-        // //     //   dd($participant);
-        // //     }
-        // // dd($participant);
-
         $contests = Contest::where('status', 1)
             ->where('start_date','<=',now()->format('Y-m-d'))
             ->where('end_date','>=',now()->format('Y-m-d'))
             ->get();
         
-
-
-            
-        
-        
-        // foreach ($contests as $key => $contest) {
-        //     // dd($contest);
-        //     $part = $contest->participants->where('status', '=', '1');
-        //         foreach ($part as $key => $partt) {
-        //     // dd($partt->status);
-        //         }
-        //     // dd($contests[0]->participants->where('status', '=', '1'));
-        // }
-        // dd($part->status);
-        // dd($contests);
         return view('participants.contestants',compact('contests'));
     }
 
     public function winners()
     {
-        $contests = Contest::all();
+        $participants = collect();
+        $contests = Contest::where('status', 1)
+            ->where('start_date','<=',now()->format('Y-m-d'))
+            ->where('end_date','>=',now()->format('Y-m-d'))
+            ->get();
 
         foreach ($contests as $key => $contest) {
-            $feature_ids = DB::table('votes')
-                 ->select(DB::raw('count(*) as vote_count, participant_id'))
-                 ->where('contest_id', '=', $contest->id)
-                 ->groupBy('participant_id')
-                 ->orderByDesc('vote_count')
-                 ->pluck('participant_id')
-                 ->take(1)->toArray();
 
-                 //dd($feature_ids);
+            $winner = Participant::withCount('votes')
+                ->with('user')
+                ->where('contest_id', $contest->id)
+                ->where('status', 2)
+                ->orderByDesc('votes_count')
+                ->take(1)
+                ->first();
 
-            if (count($feature_ids) > 0) {
-                $tempStr = implode(',', $feature_ids);
-                $featured = Participant::whereIn('id', $feature_ids)
-                            ->orderByRaw(DB::raw("FIELD(id, $tempStr)"))
-                            ->take(1)
-                            ->first();
-
-                $participants = collect();
-                $participants->push($featured);
+            if ($winner) {
+                $participants->push($winner);
             }
         } 
-
-        // $participants = $participants->paginate(20);
-
-        //dd($participants[0]->votes);
-        // return $features;
 
         return view('participants.winners',compact('participants'));
     }
