@@ -34,12 +34,24 @@ Route::get('v1/contests-by-type/{type}', 'App\Http\Controllers\Api\V1\Admin\Cont
 Route::get('v1/single-contest/{id}', 'App\Http\Controllers\Api\V1\Admin\ContestApiController@show');
 Route::get('v1/contest-search', 'App\Http\Controllers\Api\V1\Admin\ContestApiController@search');
 
+// Listings
+Route::get('v1/list-participants', 'App\Http\Controllers\Api\V1\Admin\ListApiController@listParticipants');
+Route::get('v1/search', 'App\Http\Controllers\Api\V1\Admin\ListApiController@search');
+
+Route::get('v1/contestants', 'App\Http\Controllers\Api\V1\Admin\ListApiController@contestants');
+Route::get('v1/winners', 'App\Http\Controllers\Api\V1\Admin\ListApiController@winners');
+
 // Page
 Route::get('v1/page/{slug}', 'ContentPageApiController@pageShow');
 
 Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Controllers\Api\V1\Admin', 'middleware' => ['auth:sanctum']], function () {
     
     Route::post('logout', 'AuthApiController@logout');
+
+    // Listings
+    Route::get('favourites', 'ListApiController@favourites');
+    Route::get('add-favourite', 'ListApiController@addFavourite');
+    Route::get('remove-favourite', 'ListApiController@removeFavourite');
 
     // Users
     Route::get('users/show-profile', 'UsersApiController@showProfile')->name('users.showProfile');
