@@ -72,7 +72,6 @@ class HomeController extends Controller
             ->where('end_date','>=',now()->format('Y-m-d'))
             ->first();
 
-        //dd($monthly_contest->participants->count());
         $participants = collect();
         
 
@@ -88,69 +87,32 @@ class HomeController extends Controller
                         if ($contest->participants()->count() > 4) 
                         {
                             $participants = $contest->participants()->where('status', '=', '1')->latest()->take(5)->get();
-                            // dd($participants);
                         }
                     }
                 }
             }
-            
-            
-            // $participants = $monthly_contest->participants()->latest()->take(5)->get();  
-            //$votes = $monthly_contest->votes()->latest()->take(5)->get();    
-            // $feature_ids = DB::table('votes')
-            //      ->select(DB::raw('count(*) as vote_count, participant_id'))
-            //      ->where('contest_id', '=', $monthly_contest->id)
-            //      ->groupBy('participant_id')
-            //      ->orderByDesc('vote_count')
-            //      ->pluck('participant_id')
-            //      ->take(5)->toArray();
 
-            // if (count($feature_ids) > 0) {
-            //     $tempStr = implode(',', $feature_ids);
-            //     $features = DB::table('participants')
-            //     ->whereIn('id', $feature_ids)
-            //     ->orderByRaw(DB::raw("FIELD(id, $tempStr)"))
-            //     ->take(3)
-            //     ->get();
-            // } else {
-            //     $features = collect();
-            // }
-        } 
-        else 
-        {
-            //$participants = collect();  
-            //$votes = collect();    
-            //$features = collect();    
+            if ($participants->count() < 5) {
+                if ($contests->count() > 0) {
+                    
+                    foreach ($contests as $key => $contest) {
+                        if ($contest->participants()->count() > 4) 
+                        {
+                            $participants = $contest->participants()->where('status', '=', '1')->orWhere('status', '=', '2')->latest()->take(5)->get();
+                        }
+                    }
+                }
+            }
         }
 
-        if ($video_contest && $video_contest->participants->count() > 0) {
-            
+        if ($video_contest && $video_contest->participants->count() > 0) 
+        {    
             $video_participants = $video_contest->participants()->where('status', '=', '1')->latest()->take(10)->get();  
-            $video_votes = $video_contest->votes()->latest()->take(5)->get();    
-            // $video_feature_ids = DB::table('votes')
-            //      ->select(DB::raw('count(*) as vote_count, participant_id'))
-            //      ->where('contest_id', '=', $video_contest->id)
-            //      ->groupBy('participant_id')
-            //      ->orderByDesc('vote_count')
-            //      ->pluck('participant_id')
-            //      ->take(5)->toArray();
-
-            // if (count($video_feature_ids) > 0) {
-            //     $video_tempStr = implode(',', $video_feature_ids);
-            //     $video_features = DB::table('participants')
-            //     ->whereIn('id', $video_feature_ids)
-            //     ->orderByRaw(DB::raw("FIELD(id, $video_tempStr)"))
-            //     ->take(3)
-            //     ->get();
-            // } else {
-            //     $video_features = collect();
-            // }
-        } 
-        else 
-        {
-            $video_participants = collect();  
-            $video_votes = collect();    
-            $video_features = collect();    
+            $video_votes = $video_contest->votes()->latest()->take(5)->get();
+            
+            if ($video_participants->count() == 0) {
+                $video_participants = $video_contest->participants()->where('status', '=', '2')->latest()->take(10)->get();
+            }
         }
         
         $mon_contests = Contest::where('status', 1)
@@ -161,9 +123,6 @@ class HomeController extends Controller
             ->where('end_date','>=',now()->format('Y-m-d'))
             ->take(6)
             ->get();
-
-        //$features = Participant::whereIn('id', $feature_ids)->get();
-        //dd($features);
         
         return view('welcome', compact('video_contest','monthly_contest','annual_contest','video_votes','video_participants','participants','contests','mon_contests'));
     }
@@ -250,6 +209,10 @@ class HomeController extends Controller
         if ($annual_contest) 
         {
             $participants = $annual_contest->participants()->where('status','1')->get();
+
+            if ($participants->count() == 0) {
+                $participants = $annual_contest->participants()->where('status', '2')->get();
+            }
         } 
 
         return response()->json($participants);
@@ -270,6 +233,10 @@ class HomeController extends Controller
         if ($video_contest) 
         {
             $participants = $video_contest->participants()->where('status','1')->get();
+
+            if ($participants->count() == 0) {
+                $participants = $video_contest->participants()->where('status', '2')->get();
+            }
         } 
 
         return response()->json($participants);
@@ -297,8 +264,19 @@ class HomeController extends Controller
                 $monthly_participants->push($participant);
             }
         }
-        
-        //dd($monthly_participants);
+
+        if ($monthly_participants->count() == 0) {
+            
+            foreach ($contests as $key => $contest) {
+            
+                $participants = $contest->participants()->where('status','2')->get();
+                
+                foreach ($participants as $key => $participant) 
+                {
+                    $monthly_participants->push($participant);
+                }
+            }
+        }
         
         return response()->json($monthly_participants);
     }
