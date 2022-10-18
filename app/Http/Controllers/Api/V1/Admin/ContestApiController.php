@@ -5,12 +5,6 @@ namespace App\Http\Controllers\Api\V1\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Contest;
-use App\Models\Category;
-use App\Models\Participant;
-use App\Models\Profession;
-use App\Models\Country;
-use App\Models\State;
-use App\Models\City;
 
 class ContestApiController extends Controller
 {
