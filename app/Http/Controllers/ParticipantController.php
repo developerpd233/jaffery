@@ -695,17 +695,66 @@ class ParticipantController extends Controller
     public function winners()
     {
         $participants = collect();
+        
         $contests = Contest::where('status', 1)
+            ->whereHas('type', function ($q) {
+                $q->where('slug', 'monthly')->orWhere('slug', 'video');
+            })
             ->where('start_date','<=',now()->format('Y-m-d'))
             ->where('end_date','>=',now()->format('Y-m-d'))
             ->get();
+        
+        $annual_contest = Contest::where('status', 1)
+            ->whereHas('type', function ($q) {
+                $q->where('slug', 'annual');
+            })
+            ->where('start_date','<=',now()->format('Y-m-d'))
+            ->where('end_date','>=',now()->format('Y-m-d'))
+            ->first();
+
+        $month_year = Participant::select(DB::raw("(DATE_FORMAT(created_at, '%m-%Y')) as month_year"))
+            ->orderBy('created_at')
+            ->groupBy(DB::raw("DATE_FORMAT(created_at, '%m-%Y')"))
+            ->pluck('month_year')
+            ->toArray();
+
+        $years = Participant::select(DB::raw("(DATE_FORMAT(created_at, '%Y')) as year"))
+            ->orderBy('created_at')
+            ->groupBy(DB::raw("DATE_FORMAT(created_at, '%Y')"))
+            ->pluck('year')
+            ->toArray();
 
         foreach ($contests as $key => $contest) {
 
+            foreach ($month_year as $key => $my) {
+                
+                $my = explode('-',$my);
+                $m  = $my[0];
+                $y  = $my[1];
+
+                $winner = Participant::withCount('votes')
+                    ->with('user')
+                    ->where('contest_id', $contest->id)
+                    ->where('status', 2)
+                    ->whereYear('created_at', $y)
+                    ->whereMonth('created_at', $m)
+                    ->orderByDesc('votes_count')
+                    ->take(1)
+                    ->first();
+
+                if ($winner) {
+                    $participants->push($winner);
+                }
+            }
+        }
+
+        foreach ($years as $key => $y) {
+                
             $winner = Participant::withCount('votes')
                 ->with('user')
-                ->where('contest_id', $contest->id)
+                ->where('contest_id', $annual_contest->id)
                 ->where('status', 2)
+                ->whereYear('created_at', $y)
                 ->orderByDesc('votes_count')
                 ->take(1)
                 ->first();
@@ -713,8 +762,10 @@ class ParticipantController extends Controller
             if ($winner) {
                 $participants->push($winner);
             }
-        } 
-
+        }
+        
+        $participants = $participants->sortBy('created_at',SORT_REGULAR,true);
+        
         return view('participants.winners',compact('participants'));
     }
 
