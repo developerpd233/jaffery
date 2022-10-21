@@ -34,7 +34,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('contest:cron')->hourly(); //->cron('* * * * *'); //->hourly();
+        $schedule->command('contest:cron')->hourly(); // ->monthlyOn(1, '00:10'); //->cron('* * * * *'); //->hourly();
     }
 
     /**
