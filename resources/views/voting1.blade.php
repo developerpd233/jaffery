@@ -14,11 +14,16 @@
 @else
 	@auth
 			@if (!$exist)
-	        <div class="alert alert-danger alert-block mt-3 flash-alert">
-	            <button type="button" class="close" data-dismiss="alert">&times;</button>    
-	            <strong>This contest is not available now!</strong>
-	        </div>
-	    @endif
+				<div class="alert alert-danger alert-block mt-3 flash-alert">
+					<button type="button" class="close" data-dismiss="alert">&times;</button>    
+					<strong>This contest is not available now!</strong>
+				</div>
+			@elseif ($participant->status == 2)
+				<div class="alert alert-danger alert-block mt-3 flash-alert">
+					<button type="button" class="close" data-dismiss="alert">&times;</button>    
+					<strong>This participant is past contest!</strong>
+				</div>
+			@endif
 	@endauth
 @endif
 
@@ -222,16 +227,18 @@
 			@auth
 				@if (!$exist)
                   
-        @else
-        	<div class="vots_btn">
+				@elseif ($participant->status == 2)
+
+        		@else
+        			<div class="vots_btn">
 						<button type="button" id="nextBtn" onclick="nextPrev(1)">Vote Now</button>	
 						<button type="button" id="prevBtn" onclick="nextPrev(-1)">Previous</button>
 					</div>
-        @endif
-      @else
-      	<div class="vots_btn">
-      		<button type="button" id="loginBtn">Vote Now</button>
-      	</div>
+        		@endif
+      		@else
+				<div class="vots_btn">
+					<button type="button" id="loginBtn">Vote Now</button>
+				</div>
 			@endauth
 
 			<div style="text-align:center;margin-top:40px;">
