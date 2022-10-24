@@ -44,6 +44,10 @@ Route::get('v1/winners', 'App\Http\Controllers\Api\V1\Admin\ListApiController@wi
 // Page
 Route::get('v1/page/{slug}', 'ContentPageApiController@pageShow');
 
+// Participant
+Route::get('v1/participants/{id}', 'ParticipantApiController@show');
+
+
 Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Controllers\Api\V1\Admin', 'middleware' => ['auth:sanctum']], function () {
     
     Route::post('logout', 'AuthApiController@logout');
@@ -59,9 +63,12 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Control
     Route::post('users/update-profile-image', 'UsersApiController@updateProfileImage')->name('users.updateProfileImage');
     Route::apiResource('users', 'UsersApiController');
 
-    // Participant
-    Route::apiResource('participants', 'ParticipantApiController');
+    // // Participant
+    // Route::apiResource('participants', 'ParticipantApiController');
 
     // Vote
     Route::apiResource('votes', 'VoteApiController');
+
+    // Comment
+    Route::apiResource('comments', 'CommentApiController');
 });
