@@ -63,8 +63,9 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Control
     Route::post('users/update-profile-image', 'UsersApiController@updateProfileImage')->name('users.updateProfileImage');
     Route::apiResource('users', 'UsersApiController');
 
-    // // Participant
-    // Route::apiResource('participants', 'ParticipantApiController');
+    // Participant
+    Route::post('participate/upload-image', 'ParticipantApiController@uploadImage');
+    Route::post('participate/upload-video', 'ParticipantApiController@uploadVideo');
 
     // Vote
     Route::apiResource('votes', 'VoteApiController');
