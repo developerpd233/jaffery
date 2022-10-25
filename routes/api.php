@@ -45,8 +45,12 @@ Route::get('v1/winners', 'App\Http\Controllers\Api\V1\Admin\ListApiController@wi
 Route::get('v1/page/{slug}', 'ContentPageApiController@pageShow');
 
 // Participant
-Route::get('v1/participants/{id}', 'ParticipantApiController@show');
+Route::get('v1/participants/{id}', 'App\Http\Controllers\Api\V1\Admin\ParticipantApiController@show');
 
+// Location
+Route::get('v1/location/country/{id}', 'App\Http\Controllers\Api\V1\Admin\LocationApiController@country');
+Route::get('v1/location/state/{id}', 'App\Http\Controllers\Api\V1\Admin\LocationApiController@state');
+Route::get('v1/location/city/{id}', 'App\Http\Controllers\Api\V1\Admin\LocationApiController@city');
 
 Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Controllers\Api\V1\Admin', 'middleware' => ['auth:sanctum']], function () {
     
