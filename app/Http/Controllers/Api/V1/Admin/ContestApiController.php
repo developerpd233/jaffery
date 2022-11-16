@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Contest;
+use App\Models\Participant;
 
 class ContestApiController extends Controller
 {
@@ -61,7 +62,27 @@ class ContestApiController extends Controller
     public function show(Request $request, $id) {
         
         $contest = Contest::where('id',$id)->first();
+
+        $participants = Participant::withCount('votes')
+            ->with('user')
+            ->where('contest_id', $contest->id)
+            ->where('status', '=', '1')
+            ->orderByDesc('votes_count')
+            ->get();
+
+        foreach ($participants as $key => $participant) 
+        {    
+            if(favouriteExist($participant->id))
+            {
+                $participant->favourite = true;
+            }
+            else{
+                $participant->favourite = false;
+            }
+        }
+
         $res['data'] = $contest;
+        $res['data']['participants'] = $participants;
                 
         return response($res, 201);
     }

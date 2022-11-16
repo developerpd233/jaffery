@@ -47,8 +47,8 @@
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/shareon@2/dist/shareon.min.css" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="{{ url('/public/css/style.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url('/public/css/responsive.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url('/css/style.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url('/css/responsive.css') }}">
 
     <!-- End Styles -->
 
@@ -97,7 +97,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script>
-<script src="{{ url('/public/js/custom.js') }}"></script>
+<script src="{{ url('/js/custom.js') }}"></script>
 <!-- End Scripts -->
 
 

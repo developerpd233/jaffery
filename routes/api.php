@@ -20,10 +20,12 @@ Route::post('v1/login', 'App\Http\Controllers\Api\V1\Admin\AuthApiController@log
 Route::post('v1/social-login', 'App\Http\Controllers\Api\V1\Admin\AuthApiController@socialLogin');
 Route::post('v1/forgot-password', 'App\Http\Controllers\Api\V1\Admin\AuthApiController@forgotPassword');
 Route::post('v1/forgot-password-otpcheck', 'App\Http\Controllers\Api\V1\Admin\AuthApiController@forgotPasswordOTPCheck');
+Route::post('v1/register-otp-check', 'App\Http\Controllers\Api\V1\Admin\AuthApiController@registerVerifyOTP');
 Route::post('v1/forgot-password-reset', 'App\Http\Controllers\Api\V1\Admin\AuthApiController@forgotPasswordreset');
 Route::post('v1/reset-password', 'App\Http\Controllers\Api\V1\Admin\AuthApiController@reset');
 Route::post('v1/check-email', 'App\Http\Controllers\Api\V1\Admin\AuthApiController@checkEmail');
 Route::post('v1/check-phone', 'App\Http\Controllers\Api\V1\Admin\AuthApiController@checkPhone');
+
 
 // Home
 Route::get('v1/search', 'App\Http\Controllers\Api\V1\Admin\HomeApiController@search');
@@ -31,30 +33,28 @@ Route::get('v1/home/contests', 'App\Http\Controllers\Api\V1\Admin\HomeApiControl
 
 // Contests
 Route::get('v1/contests-by-type/{type}', 'App\Http\Controllers\Api\V1\Admin\ContestApiController@index');
-Route::get('v1/single-contest/{id}', 'App\Http\Controllers\Api\V1\Admin\ContestApiController@show');
 Route::get('v1/contest-search', 'App\Http\Controllers\Api\V1\Admin\ContestApiController@search');
 
 // Listings
-Route::get('v1/list-participants', 'App\Http\Controllers\Api\V1\Admin\ListApiController@listParticipants');
 Route::get('v1/search', 'App\Http\Controllers\Api\V1\Admin\ListApiController@search');
 
-Route::get('v1/contestants', 'App\Http\Controllers\Api\V1\Admin\ListApiController@contestants');
-Route::get('v1/winners', 'App\Http\Controllers\Api\V1\Admin\ListApiController@winners');
-
 // Page
-Route::get('v1/page/{slug}', 'ContentPageApiController@pageShow');
-
-// Participant
-Route::get('v1/participants/{id}', 'App\Http\Controllers\Api\V1\Admin\ParticipantApiController@show');
+Route::get('v1/page/{id}', 'App\Http\Controllers\Api\V1\Admin\PageApiController@show');
 
 // Location
-Route::get('v1/location/country/{id}', 'App\Http\Controllers\Api\V1\Admin\LocationApiController@country');
+Route::get('v1/location/country', 'App\Http\Controllers\Api\V1\Admin\LocationApiController@country');
 Route::get('v1/location/state/{id}', 'App\Http\Controllers\Api\V1\Admin\LocationApiController@state');
 Route::get('v1/location/city/{id}', 'App\Http\Controllers\Api\V1\Admin\LocationApiController@city');
+Route::get('v1/location/profession', 'App\Http\Controllers\Api\V1\Admin\LocationApiController@profession');
 
 Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Controllers\Api\V1\Admin', 'middleware' => ['auth:sanctum']], function () {
     
     Route::post('logout', 'AuthApiController@logout');
+
+    Route::get('single-contest/{id}', 'ContestApiController@show');
+    Route::get('list-participants', 'ListApiController@listParticipants');
+    Route::get('contestants', 'ListApiController@contestants');
+    Route::get('winners', 'ListApiController@winners');
 
     // Listings
     Route::get('favourites', 'ListApiController@favourites');
@@ -70,6 +70,8 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Control
     // Participant
     Route::post('participate/upload-image', 'ParticipantApiController@uploadImage');
     Route::post('participate/upload-video', 'ParticipantApiController@uploadVideo');
+    Route::post('participant/vote', 'ParticipantApiController@vote');
+    Route::get('participants/{id}', 'ParticipantApiController@show');
 
     // Vote
     Route::apiResource('votes', 'VoteApiController');

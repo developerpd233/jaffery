@@ -46,10 +46,22 @@ class ListApiController extends Controller
                 $user_ids = $type->users()->pluck('id')->toArray();
         
                 $participants = Participant::withCount('votes')
+                    ->with('user')
                     ->whereIn('user_id', $user_ids)
                     ->where('status', '=', '1')
                     ->orderByDesc('votes_count')
                     ->get();
+            }
+        }
+
+        foreach ($participants as $key => $participant) 
+        {    
+            if(favouriteExist($participant->id))
+            {
+                $participant->favourite = true;
+            }
+            else{
+                $participant->favourite = false;
             }
         }
 
@@ -92,14 +104,26 @@ class ListApiController extends Controller
             ->where('end_date','>=',now()->format('Y-m-d'))
             ->get();
         
-        foreach ($contests as $key => $contest) {
+        foreach ($contests as $key => $contest) 
+        {
             $participants = Participant::withCount('votes')
                 ->with('user')
                 ->where('contest_id', $contest->id)
                 ->where('status', 1)
                 ->orderByDesc('votes_count')
-                ->take(5)
+                ->take(6)
                 ->get();
+
+            foreach ($participants as $key => $participant) 
+            {    
+                if(favouriteExist($participant->id))
+                {
+                    $participant->favourite = true;
+                }
+                else{
+                    $participant->favourite = false;
+                }
+            }
 
             $contest->participants = $participants;
         }
@@ -117,6 +141,22 @@ class ListApiController extends Controller
                 ->whereIn('id', $favourites)
                 ->with('user')
                 ->get();
+
+        foreach ($favourites as $key => $participant) 
+        {    
+            $participant->favourite = true;
+            $contest = $participant->contest;
+
+            if ($participant->status == 2) {
+                $part = $contest->participants()->where('status',2)->orderByDesc('position')->first(); 
+            } else {
+                $part = $contest->participants()->where('status',1)->orderByDesc('position')->first();
+            }
+
+            if ($participant->position == 0) {
+                $participant->position = $part->position + 1;
+            }
+        }
 
         $res['data'] = $favourites;
         return response($res, 201);
@@ -211,7 +251,7 @@ class ListApiController extends Controller
                 $winner = Participant::withCount('votes')
                     ->with('user')
                     ->where('contest_id', $contest->id)
-                    ->where('status', 2)
+                    ->where('status', 1)
                     ->whereYear('created_at', $y)
                     ->whereMonth('created_at', $m)
                     ->orderByDesc('votes_count')
@@ -229,7 +269,7 @@ class ListApiController extends Controller
             $winner = Participant::withCount('votes')
                 ->with('user')
                 ->where('contest_id', $annual_contest->id)
-                ->where('status', 2)
+                ->where('status', 1)
                 ->whereYear('created_at', $y)
                 ->orderByDesc('votes_count')
                 ->take(1)
@@ -240,7 +280,19 @@ class ListApiController extends Controller
             }
         }
         
+        foreach ($participants as $key => $participant) 
+        {    
+            if(favouriteExist($participant->id))
+            {
+                $participant->favourite = true;
+            }
+            else{
+                $participant->favourite = false;
+            }
+        }
+
         $participants = $participants->sortBy('created_at',SORT_REGULAR,true);
+        $participants = array_values($participants->toArray());
 
         $res['data'] = $participants;
         return response($res, 201);

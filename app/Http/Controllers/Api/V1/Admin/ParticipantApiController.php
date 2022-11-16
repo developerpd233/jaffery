@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers\Api\V1\Admin;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Models\Vote;
+use App\Models\Company;
 use App\Models\Participant;
 
-use App\Models\Vote;
 use App\Models\Transaction;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\DB;
 
 class ParticipantApiController extends Controller
 {
@@ -220,17 +221,162 @@ class ParticipantApiController extends Controller
         return response($res, 400);
     }
 
-    public function show(Request $request, Participant $participant) {
+    public function show(Request $request, $id) {
 
-        $comments = $participant->comments()->latest()->take(20)->get();
-        $votes = $participant->votes()->latest()->take(10)->get();
+        $participant = Participant::with('user', 'contest')->where('id',$id)->first();
 
-        $participant->load('user', 'contest');
+        if (!$participant) {
+            return response(['message' => 'Data not found!'], 404);
+        }
 
-        $participant->comments = $comments;
+        $user = $participant->user;
+        // $comments = $participant->comments()->with('user')->latest()->take(20)->get();
+        $votes = $participant->votes()->with('user')->latest()->take(10)->get();
+
+        if(favouriteExist($participant->id))
+        {
+            $participant->favourite = true;
+        }
+        else{
+            $participant->favourite = false;
+        }
+
+        $participant->country = $user->country->name;
+        $participant->state = isset($user->state) ? $user->state->name : '';
+        $participant->city = isset($user->city) ? $user->city->name : '';
+        // $participant->comments = $comments;
         $participant->votes = $votes;
 
         $res = ['participant' => $participant];
         return response($res, 200);
+    }
+
+    public function vote(Request $request)
+    {
+        $this->validate($request, [
+            'participant_id' => 'required|exists:participants,id',
+            'amount' => 'required|numeric',
+            'order_id' => 'required|string',
+            'method' => 'required|string',
+            'message' => 'required|string',
+        ]); 
+
+        $data = $request->all();
+
+        // dd($data);
+
+        $participant = Participant::findOrFail($data['participant_id']);
+        $company = Company::where('key','amount')->first();
+        $contest = $participant->contest;
+        $user = auth()->user();
+        $amount = $data['amount'];
+
+        //dd($contest);
+
+        if ($contest->type->slug == 'monthly') {
+            $kitty = ( $amount / 100 ) * 57;
+            $contest_amount = $amount - $kitty;
+        }
+        elseif ($contest->type->slug == 'video') {
+            $kitty = ( $amount / 100 ) * 57;
+            $contest_amount = $amount - $kitty;
+        } 
+        else {
+            $count = Vote::where('contest_id',$contest->id)->where('user_id', $user->id)->count();
+
+            if ($count == 0) {
+                $kitty = $amount;
+                $contest_amount = 0;
+            } else {
+                $kitty = 0;
+                $contest_amount = $amount;
+            }
+        }        
+
+        $company_amount = $kitty;
+
+        $contest->amount = $contest->amount + $contest_amount;
+        $contest->save();
+
+        if ($company) {
+            $company->value = $company->value + $company_amount;
+            $company->save();
+        }else{
+            $company = Company::create([
+                'key' => 'amount',
+                'value' => $company_amount,
+            ]);
+        }
+
+        
+        $vote = Vote::create([
+            'user_id' => auth()->user()->id,
+            'contest_id' => $contest->id,
+            'participant_id' => $participant->id,
+        ]);
+
+        if ($vote) {
+
+            $transaction = Transaction::create([
+                'user_id' => auth()->user()->id,
+                'status' => $request->message,
+                'method' => $request->method,
+                'amount' => intval($data['amount']),
+                'kitty' => $kitty,
+                'type' => 'vote',
+                'transaction_token' => $request->order_id
+            ]);
+
+            try 
+            {
+                
+                // Mail::to('theoflas@yahoo.com')->send(new TransactionMail($transaction,auth()->user(),$participant,$participant->contest));
+
+                Mail::to(auth()->user()->email)->send(new TransactionMail($transaction,auth()->user(),$participant,$participant->contest));
+                
+            }
+            catch (\Throwable $th) {
+               
+            }
+
+            $vote->transaction_id = $transaction->id;
+            $vote->save();
+
+            $feature_ids = DB::table('votes')
+                             ->select(DB::raw('count(*) as vote_count, participant_id'))
+                             ->where('contest_id', '=', $contest->id)
+                             ->groupBy('participant_id')
+                             ->orderByDesc('vote_count')
+                             ->pluck('participant_id')
+                             ->toArray();
+
+            $tempStr = implode(',', $feature_ids);
+            $participants = Participant::whereIn('id', $feature_ids)
+                        ->where('status', 1)
+                        ->orderByRaw(DB::raw("FIELD(id, $tempStr)"))
+                        ->get();
+
+            $contest_amount = $contest->amount;
+            $first_prize = $contest_amount;
+
+            foreach ($participants as $key => $participant) {
+                
+                if ($key == 0) {
+                    $participant->amount = $first_prize;
+                }
+                else{
+                    $participant->amount = 0;   
+                }
+                
+                $participant->position = $key + 1;
+                $participant->save();
+            }
+
+            return response()->json(['code'=>200, 'message'=>'Vote submitted successfully','url' => route('participant.show',$participant->id)], 200);
+            //return redirect(route('participant.show',$info[0]['participant_id']))->with('success' , 'You are voted successfully.');
+        }
+        
+        return response()->json(['code'=>404, 'message'=>'Something went wrong in voting!'], 200);
+        //return redirect(route('participant.show',$participant->id))->with('error' , 'Something went wrong in voting!');
     }
 }

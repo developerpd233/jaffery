@@ -76,30 +76,30 @@ class HomeApiController extends Controller
             ->whereHas('type', function ($q) {
                 $q->where('slug', 'annual');
             })
-            ->where('start_date','<=',now()->format('Y-m-d'))
-            ->where('end_date','>=',now()->format('Y-m-d'))
+            // ->where('start_date','<=',now()->format('Y-m-d'))
+            // ->where('end_date','>=',now()->format('Y-m-d'))
             ->first();
 
         $video_contest = Contest::where('status', 1)
             ->whereHas('type', function ($q) {
                 $q->where('slug', 'video');
             })
-            ->where('start_date','<=',now()->format('Y-m-d'))
-            ->where('end_date','>=',now()->format('Y-m-d'))
+            // ->where('start_date','<=',now()->format('Y-m-d'))
+            // ->where('end_date','>=',now()->format('Y-m-d'))
             ->first();
 
         $monthly_contests = Contest::where('status', 1)
             ->whereHas('type', function ($q) {
                 $q->where('slug', 'monthly');
             })
-            ->where('start_date','<=',now()->format('Y-m-d'))
-            ->where('end_date','>=',now()->format('Y-m-d'))
+            // ->where('start_date','<=',now()->format('Y-m-d'))
+            // ->where('end_date','>=',now()->format('Y-m-d'))
             ->take(6)
             ->get();
         
         $res['data'] = [
-            'annual_contest' => $annual_contest,
             'video_contest' => $video_contest,
+            'annual_contest' => $annual_contest,
             'monthly_contests' => $monthly_contests,
         ];
                 

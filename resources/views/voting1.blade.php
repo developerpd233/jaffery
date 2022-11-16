@@ -174,10 +174,10 @@
 						<span class="txt">number</span>
 						<span class="txt">{{ $participant->id }}</span>
 					</li>
-					<li>
+					{{-- <li>
 						<span class="txt">City, State  or teritorry</span>
 						<span class="txt">{{ isset($participant->user->city->name) ? $participant->user->city->name.', ' : '' }} {{ isset($participant->user->state->name) ? $participant->user->state->name : ''  }}</span>
-					</li>
+					</li> --}}
 					<li>
 						<span class="txt">votes</span>
 						<span class="txt">{{ $participant->votes->count() }}</span>
@@ -204,10 +204,10 @@
 							<div class="usd">USD</div>
 						</span>
 					</li>
-					<li>
+					{{-- <li>
 						<span class="txt">city, State  or teritorry</span>
 						<span class="txt">{{ isset($participant->user->city->name) ? $participant->user->city->name.', ' : '' }} {{ isset($participant->user->state->name) ? $participant->user->state->name : ''  }}</span>
-					</li>
+					</li> --}}
 					<li>
 						<span class="txt">country</span>
 						<span class="txt">{{ isset($participant->user->country->name) ? $participant->user->country->name : '' }}</span>
