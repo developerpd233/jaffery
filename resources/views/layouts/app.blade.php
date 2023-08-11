@@ -56,10 +56,10 @@
       $segment = Request::segment(1);
     @endphp
 
+    {!! RecaptchaV3::initJs() !!}
     @if ($segment == 'login' || $segment == 'register')
-      {!! RecaptchaV3::initJs() !!}
     @endif
-    
+
     @yield('css')
 
     <script type="text/javascript">
@@ -79,11 +79,11 @@
         @endif
 
         @yield('content')
-    
+
         @include('layouts/footer')
-    
+
         <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-delay="5000" style="position: absolute; bottom: 1rem; right: 1rem;">
-      
+
       <div class="toast-body" style="background-color: #38c172;
     color: white">
         Favourite request, successfully completed.
@@ -104,8 +104,8 @@
 <script>
 
   /*for login drop down*/
-  
-/* When the user clicks on the button, 
+
+/* When the user clicks on the button,
 toggle between hiding and showing the dropdown content */
 function myFunction() {
   document.getElementById("myDropdown").classList.toggle("show");
@@ -207,12 +207,12 @@ function fixStepIndicator(n) {
 
   $(document).ready(function(){
     $("body").on('click','.favourite',function(){
-      
+
       var fav = $(this);
       var user = fav.data('user');
       var participant = fav.data('participant');
-      var status = $(this).data('status');  
-      
+      var status = $(this).data('status');
+
       if (status == '0') {
         createFavourite(user,participant,status,fav);
       }
@@ -224,7 +224,7 @@ function fixStepIndicator(n) {
   });
 
   function createFavourite(user,participant,status,fav) {
-    
+
     let _url     = '{{ url("/favourites") }}';
     let _token   = $('meta[name="csrf-token"]').attr('content');
 
@@ -238,7 +238,7 @@ function fixStepIndicator(n) {
       success: function(response) {
         if(response.code == 200) {
           fav.parent().append(`<a href="javascript:void(0)" class="favourite" data-user="${user}" data-participant="${participant}" data-status="1">
-                    <i class="fa fa-heart" aria-hidden="true"></i> 
+                    <i class="fa fa-heart" aria-hidden="true"></i>
                   </a>`);
           fav.remove();
           $('.toast').toast('show');
@@ -247,7 +247,7 @@ function fixStepIndicator(n) {
       error: function(response) {
         console.log(response);
         fav.parent().append(`<a href="javascript:void(0)" class="favourite" data-user="${user}" data-participant="${participant}" data-status="0">
-                    <i class="fa fa-heart-o" aria-hidden="true"></i> 
+                    <i class="fa fa-heart-o" aria-hidden="true"></i>
                   </a>`);
         fav.remove();
       }
@@ -269,7 +269,7 @@ function fixStepIndicator(n) {
       success: function(response) {
         if(response.code == 200) {
           fav.parent().append(`<a href="javascript:void(0)" class="favourite" data-user="${user}" data-participant="${participant}" data-status="0">
-                    <i class="fa fa-heart-o" aria-hidden="true"></i> 
+                    <i class="fa fa-heart-o" aria-hidden="true"></i>
                   </a>`);
           fav.remove();
           $('.toast').toast('show');
@@ -278,7 +278,7 @@ function fixStepIndicator(n) {
       error: function(response) {
         console.log(response);
         fav.parent().append(`<a href="javascript:void(0)" class="favourite" data-user="${user}" data-participant="${participant}" data-status="1">
-                    <i class="fa fa-heart" aria-hidden="true"></i> 
+                    <i class="fa fa-heart" aria-hidden="true"></i>
                   </a>`);
         fav.remove();
       }

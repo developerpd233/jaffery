@@ -17,13 +17,36 @@
             <h2 class="photo-sec-h2">{{ $contest->title }}</h2>
             <a class="hero-upload" href="{{ url('participate/').'/'.$contest->id }}">Join the Contest</a>
         </div>
-        
 
         @if($participants->count() > 0)
+            @foreach ($participants as $key => $participant)
+            @if($key <= 4)
+                @if($key == 0 || $key == 1)
+                    <div class="half">
+                @endif
+                    <div class="box">
+                        <a class="img" href="{{ url('participant/').'/'.$participant->id }}"><img src="{{ Voyager::image($participant->image) }}"></a>
+                        <div class="circle">
+                            <a href="{{ url('users/').'/'.$participant->user->id }}"><img src="{{ $participant->user->provider ? $participant->user->avatar : Voyager::image($participant->user->avatar) }}"></a>
+                            <h5>{{$participant->name}}
+                                <br>1st @if($key == 0) 1st @elseif($key == 1) 2nd @elseif($key == 2) 3rd @elseif($key == 3) 4th @elseif($key == 4) 5th @endif
+                                Positon, {{$participant->votes()->whereHas('user')->count()}} Votes</h5>
+                        </div>
+                    </div>
+                @if($key == 0 || $key+1 == $participants->count() || $key == 4)
+                    </div>
+                @endif
+                @endif
+            @endforeach
+        @else
+        <h3>No participant yet on this location.</h3>
+        @endif
+
+        {{-- @if($participants->count() > 0)
         @if(isset($participants[0]))
         <div class="half">
             <div class="box">
-                <a class="img" href="{{ url('participant/').'/'.$participants[0]->id }}"><img src="{{ Voyager::image($participants[0]->image) }}"></a> 
+                <a class="img" href="{{ url('participant/').'/'.$participants[0]->id }}"><img src="{{ Voyager::image($participants[0]->image) }}"></a>
                 <div class="circle">
                     <a href="{{ url('users/').'/'.$participants[0]->user->id }}"><img src="{{ $participants[0]->user->provider ? $participants[0]->user->avatar : Voyager::image($participants[0]->user->avatar) }}"></a>
                     <h5>{{$participants[0]->name}}<br>1st Positon, {{$participants[0]->votes->count()}} Votes</h5>
@@ -72,8 +95,8 @@
         </div>
         @endif
         @else
-        <h3>No participant yet on this location.</h3>   
-        @endif
+        <h3>No participant yet on this location.</h3>
+        @endif --}}
 
         @if($participants->count() > 5)
             <div class="full">
@@ -83,12 +106,12 @@
                             <a class="img" href="{{ url('participant/').'/'.$participant->id }}"><img src="{{ Voyager::image($participant->image) }}"></a>
                             <div class="circle">
                                 <a href="{{ url('users/').'/'.$participant->user->id }}"><img src="{{ $participant->user->provider ? $participant->user->avatar : Voyager::image($participant->user->avatar) }}"></a>
-                                <h5>{{$participant->name}}<br>{{$key+1}}th Positon, {{$participant->votes->count()}} Votes</h5>
+                                <h5>{{$participant->name}}<br>{{$key+1}}th Positon, {{$participant->votes()->whereHas('user')->count()}} Votes</h5>
                             </div>
                         </div>
                     @endif
                 @endforeach
-            </div>   
+            </div>
         @endif
 
     </div>
@@ -107,9 +130,9 @@
         let input = document.getElementById('searchbar').value
         input=input.toLowerCase();
         let x = document.getElementsByClassName('search');
-          
+
         if (input.length > 2) {
-            
+
             $.ajax({
                 type:"GET",
                 url: '{{ url("/search") }}',
@@ -120,7 +143,7 @@
 
                         var url = '{{ url("participant/") }}'+'/'+d.id;
                             $('#list').append(`<a href="${url}" class="search">${d.name}</a>`);
-                        
+
                     });
                 }
             });

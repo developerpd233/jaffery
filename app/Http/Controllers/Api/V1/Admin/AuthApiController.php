@@ -33,7 +33,7 @@ class AuthApiController extends Controller
         ];
         return response($res, 201);
     }
-    
+
     public function signup(Request $request)
     {
         //dd(phpinfo());
@@ -65,12 +65,12 @@ class AuthApiController extends Controller
         $filepath = '';
 
         if ($request->has('image')) {
-            
+
             $rand = md5(microtime());
             $image       = $request->file('image');
             $filename    = $rand.'.'.$image->getClientOriginalExtension();
-            $filepath = '/users/'.date('FY').'/'.$filename;      
-            
+            $filepath = '/users/'.date('FY').'/'.$filename;
+
             $image_resize = Image::make($image);
 
             $image_resize->save(storage_path().'/app/public/users/'.date('FY').'/'.$filename);
@@ -85,49 +85,51 @@ class AuthApiController extends Controller
 
         $user = User::create($data);
 
-        
 
-        // try 
-        // {
-        //     // Mail::to($request->email)->send(new WelcomeMail($user));
-        //     Mail::to($request->email)->send(new WelcomeMail($user));
 
-        //     $res = ['status' => 'success', 'message' => 'OTP sent on email. Please verify email.'];
-        //     return response($res, 201);    
-        // } 
-        // catch (\Throwable $th) {
-        //     $res = ['status' => 'failed', 'error' => $th];
-        //     return response($res, 401);
-        // }
-
-        if ($user) {
-        
-            event(new Registered($user));
-
-        $user->update([
-            'forgot_otp' => rand(0, 9999)
-        ]);
-
-        try 
+        try
         {
-            Mail::to($request->email)->send(new \App\Mail\forgot_otp($user));
+            // Mail::to($request->email)->send(new WelcomeMail($user));
+            Mail::to($request->email)->send(new WelcomeMail($user));
 
-            $res = ['status' => 'success', 'message' => 'User registered. OTP sent to your email address. Please verify.'];
-            return response($res, 201);
-        } 
-        catch (\Throwable $th) 
-        {
+            // $res = ['status' => 'success', 'message' => 'OTP sent on email. Please verify email.'];
+            // return response($res, 201);
+        }
+        catch (\Throwable $th) {
             $res = ['status' => 'failed', 'error' => $th];
             return response($res, 401);
         }
-            
-        } 
+
+        if ($user) {
+
+                // $res = ['status' => 'success', 'message' => 'User registered. OTP sent to your email address. Please verify.'];
+                // return response($res, 201);
+            // event(new Registered($user));
+
+            $user->update([
+                'forgot_otp' => rand(0, 9999)
+            ]);
+
+            try
+            {
+                Mail::to($request->email)->send(new forgot_otp($user));
+
+                $res = ['status' => 'success', 'message' => 'User registered. OTP sent to your email address. Please verify.'];
+                return response($res, 201);
+            }
+            catch (\Throwable $th)
+            {
+                $res = ['status' => 'failed', 'error' => $th];
+                return response($res, 401);
+            }
+
+        }
         else {
             $res = ['status' => 'failed', 'error' => 'Something went wrong!'];
             return response($res, 401);
         }
-        
-        
+
+
 
         // $token = $user->createToken('apiToken')->plainTextToken;
 
@@ -146,7 +148,11 @@ class AuthApiController extends Controller
         ]);
 
         $user = User::where('email', $data['email'])->first();
-
+        if(!$user){
+            return response([
+                'msg' => 'Incorrect email or password.'
+            ], 401);
+        }
         if ($user->email_verified_at == null) {
             return response([
                 'msg' => 'Email not verified. Please check email.'
@@ -219,7 +225,7 @@ class AuthApiController extends Controller
 
     public function forgotPassword(Request $request)
     {
-        
+
         $request->validate([
             'email' => 'required|email',
         ]);
@@ -228,26 +234,26 @@ class AuthApiController extends Controller
 
         if (!$user) {
             $res = ["error" => "We can't find a user with that e-mail address."];
-            return response($res, 401);         
+            return response($res, 401);
         }else{
             $user->update([
                 'forgot_otp' => rand(0, 999999),
                 'forgot_expiry_time' => date(now())
             ]);
 
-            try 
+            try
             {
                 Mail::to($request->email)->send(new \App\Mail\forgot_otp($user));
 
                 $res = ['status' => 'success', 'message' => 'OTP sent to your email address.'];
                 return response($res, 201);
-            } 
-            catch (\Throwable $th) 
+            }
+            catch (\Throwable $th)
             {
                 $res = ['status' => 'failed', 'error' => $th];
                 return response($res, 401);
             }
-        } 
+        }
     }
 
     public function forgotPasswordOTPCheck(Request $request){
@@ -258,12 +264,12 @@ class AuthApiController extends Controller
 
         $user = User::where('forgot_otp',$request->otp_number)->first();
 
-        if ($user) 
+        if ($user)
         {
             $current_date = Carbon::parse(date(now()));
             $forgot_expiry_time = Carbon::parse($user->forgot_expiry_time);
             $date_diff = $current_date->diffInMinutes($forgot_expiry_time);
-            
+
             if ($date_diff <= 5) {
 
                 $token = $user->createToken('apiToken')->plainTextToken;
@@ -281,16 +287,16 @@ class AuthApiController extends Controller
             {
                 $res = ['status' => 'failed', 'message' => 'OTP verification timeout, please send code again'];
             }
-        } 
-        else 
+        }
+        else
         {
             $res = ['status' => 'failed', 'message' => 'OTP Number not matched, please try again'];
         }
-        
+
         if ($res['status'] == 'success') {
             return response($res, 201);
         }
-        
+
         return response($res, 401);
     }
 
@@ -303,11 +309,12 @@ class AuthApiController extends Controller
 
         $user = User::where('email',$request->email)->where('forgot_otp',$request->otp_number)->first();
 
-        if ($user) 
+        if ($user)
         {
                 $token = $user->createToken('apiToken')->plainTextToken;
 
                 $user->update([
+                    'email_verified_at' => now(),
                     'forgot_otp' => NULL,
                     'forgot_expiry_time' => NULL,
                     // 'otp_token' => $token
@@ -315,8 +322,8 @@ class AuthApiController extends Controller
 
                 $res = ['status' => 'success', 'message' => 'OTP verification successful', 'token' => $token, 'user' => $user];
                 return response($res, 201);
-        } 
-        else 
+        }
+        else
         {
             $res = ['status' => 'failed', 'message' => 'OTP number or email not matched, please try again'];
             return response($res, 200);
@@ -334,7 +341,7 @@ class AuthApiController extends Controller
 
         $user = User::where('otp_token',$request->token)->first();
 
-        if ($user) 
+        if ($user)
         {
             $user->update([
                 'password' => Hash::make($request->password),
@@ -343,11 +350,12 @@ class AuthApiController extends Controller
 
             $res = ['status' => 'success', 'message' => 'Change password is successful'];
             return response($res, 201);
-        } 
-        else 
+        }
+        else
         {
             $res_failed = ['status' => 'failed', 'message' => 'Token not matched'];
             return response($res_failed, 404);
         }
     }
 }
+

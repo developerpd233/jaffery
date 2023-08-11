@@ -31,7 +31,7 @@
 			  <div class="modal-dialog" role="document">
 			    <div class="modal-content">
 			      <div class="modal-header">
-			        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+			        <h5 class="modal-title" id="exampleModalLabel">Join the Contest</h5>
 			        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
 			          <span aria-hidden="true">&times;</span>
 			        </button>
@@ -39,25 +39,29 @@
 			      <div class="modal-body">
 			      	@if($annual_contest != null)
 			      		<div class="form-check">
-							<input type="radio" class="radio-input" name="radio-0" data-url="{{ url('participate/').'/'.$annual_contest->id }}">
+							<input type="radio" class="radio-input" name="join-contest" value="{{ url('participate/').'/'.$annual_contest->id }}">
+							<!-- <input type="radio" class="radio-input" name="radio-0" data-url="{{ url('participate/').'/'.$annual_contest->id }}"> -->
 							{{ $annual_contest->title." (Annual Contest)" }}
 						</div>
 			      	@endif
 			      	@if($video_contest != null)
 			      		<div class="form-check">
-							<input type="radio" class="radio-input" name="radio-2" data-url="{{ url('participate/').'/'.$video_contest->id }}">
+							<input type="radio" class="radio-input" name="join-contest" value="{{ url('participate/').'/'.$video_contest->id }}">
+							<!-- <input type="radio" class="radio-input" name="radio-2" data-url="{{ url('participate/').'/'.$video_contest->id }}"> -->
 							{{ $video_contest->title." (Video Contest)" }}
 						</div>
 			      	@endif
 			      	@foreach($mon_contests as $contest)
 			      		<div class="form-check">
-							<input type="radio" class="radio-input" name="radio-1" data-url="{{ url('participate/').'/'.$contest->id }}">
+							<input type="radio" class="radio-input" name="join-contest" value="{{ url('participate/').'/'.$contest->id }}">
+							<!-- <input type="radio" class="radio-input" name="radio-1" data-url="{{ url('participate/').'/'.$contest->id }}"> -->
 							{{ $contest->title." (Monthly Contest)" }}
 						</div>
 			      	@endforeach
 			      </div>
 			      <div class="modal-footer">
-			        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+			        <button type="button" class="btn btn-dark" id="join-contest" disabled>Join the Contest</button>
+			        <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
 			      </div>
 			    </div>
 			  </div>
@@ -79,7 +83,7 @@
                 <h5>{{ date("Y") }}<br> Annual Contest</h5>
                 <h6>$ {{ $annual_contest != null ? $annual_contest->amount : 0 }}</h6>
             </div>
-        </div> 
+        </div>
     </div>
 </section>
 
@@ -98,10 +102,11 @@
 	    		<li><a href="{{ url('profession/modeling') }}">Browse By Profession</a></li>
 	    		<li>
 	    			@php
-	    				$ad_image = setting('site.advertise_image') != '' ? url('/public/storage/').'/'.setting('site.advertise_image') : 'https://posetopost.com/img/Group62ddd.png'; 
+	    				$ad_image = setting('site.advertise_image') != '' ? url('/public/storage/').'/'.setting('site.advertise_image') : 'https://posetopost.com/img/Group62ddd.png';
 	    			@endphp
-	    			<a href="{{ setting('site.advertise_url') }}">
-	    				<img src="{{ $ad_image }}">
+	    			<a href="{{ setting('site.advertise_url') }}" target="_blank">
+	    				<!-- <img src="{{ $ad_image }}"> -->
+	    				<img src="{{ asset(Storage::url(setting('site.advertise_image'))) }}">
 	    			</a>
 	    			<!-- <a href="#">
 	    				<img src="{{ url('img/Group62ddd.png') }}">
@@ -162,16 +167,16 @@
 								@auth
 									@if(favouriteExist($participants[1]->id))
 										<a href="javascript:void(0)" class="favourite" data-user="{{ auth()->user()->id }}" data-participant="{{ $participants[1]->id }}" data-status="1">
-											<i class="fa fa-heart" aria-hidden="true"></i> 
+											<i class="fa fa-heart" aria-hidden="true"></i>
 										</a>
 									@else
 										<a href="javascript:void(0)" class="favourite" data-user="{{ auth()->user()->id }}" data-participant="{{ $participants[1]->id }}" data-status="0">
-											<i class="fa fa-heart-o" aria-hidden="true"></i> 
+											<i class="fa fa-heart-o" aria-hidden="true"></i>
 										</a>
-									@endif								
+									@endif
 								@else
 									<a href="{{ url('login') }}">
-										<i class="fa fa-heart-o" aria-hidden="true"></i> 
+										<i class="fa fa-heart-o" aria-hidden="true"></i>
 									</a>
 								@endauth
 							</div>
@@ -187,22 +192,22 @@
 								@auth
 									@if(favouriteExist($participants[2]->id))
 										<a href="javascript:void(0)" class="favourite" data-user="{{ auth()->user()->id }}" data-participant="{{ $participants[2]->id }}" data-status="1">
-											<i class="fa fa-heart" aria-hidden="true"></i> 
+											<i class="fa fa-heart" aria-hidden="true"></i>
 										</a>
 									@else
 										<a href="javascript:void(0)" class="favourite" data-user="{{ auth()->user()->id }}" data-participant="{{ $participants[2]->id }}" data-status="0">
-											<i class="fa fa-heart-o" aria-hidden="true"></i> 
+											<i class="fa fa-heart-o" aria-hidden="true"></i>
 										</a>
-									@endif								
+									@endif
 								@else
 									<a href="{{ url('login') }}">
-										<i class="fa fa-heart-o" aria-hidden="true"></i> 
+										<i class="fa fa-heart-o" aria-hidden="true"></i>
 									</a>
 								@endauth
 							</div>
 						</a>
-					</div>	
-				@endif		
+					</div>
+				@endif
 			</div>
 			@endif
 			@if(isset($participants[0]))
@@ -215,16 +220,16 @@
 							@auth
 								@if(favouriteExist($participants[0]->id))
 									<a href="javascript:void(0)" class="favourite" data-user="{{ auth()->user()->id }}" data-participant="{{ $participants[0]->id }}" data-status="1">
-										<i class="fa fa-heart" aria-hidden="true"></i> 
+										<i class="fa fa-heart" aria-hidden="true"></i>
 									</a>
 								@else
 									<a href="javascript:void(0)" class="favourite" data-user="{{ auth()->user()->id }}" data-participant="{{ $participants[0]->id }}" data-status="0">
-										<i class="fa fa-heart-o" aria-hidden="true"></i> 
+										<i class="fa fa-heart-o" aria-hidden="true"></i>
 									</a>
-								@endif								
+								@endif
 							@else
 								<a href="{{ url('login') }}">
-									<i class="fa fa-heart-o" aria-hidden="true"></i> 
+									<i class="fa fa-heart-o" aria-hidden="true"></i>
 								</a>
 							@endauth
 						</div>
@@ -243,21 +248,21 @@
 								@auth
 									@if(favouriteExist($participants[3]->id))
 										<a href="javascript:void(0)" class="favourite" data-user="{{ auth()->user()->id }}" data-participant="{{ $participants[3]->id }}" data-status="1">
-											<i class="fa fa-heart" aria-hidden="true"></i> 
+											<i class="fa fa-heart" aria-hidden="true"></i>
 										</a>
 									@else
 										<a href="javascript:void(0)" class="favourite" data-user="{{ auth()->user()->id }}" data-participant="{{ $participants[3]->id }}" data-status="0">
-											<i class="fa fa-heart-o" aria-hidden="true"></i> 
+											<i class="fa fa-heart-o" aria-hidden="true"></i>
 										</a>
-									@endif								
+									@endif
 								@else
 									<a href="{{ url('login') }}">
-										<i class="fa fa-heart-o" aria-hidden="true"></i> 
+										<i class="fa fa-heart-o" aria-hidden="true"></i>
 									</a>
 								@endauth
 							</div>
 						</a>
-					</div>	
+					</div>
 				@endif
 				@if(isset($participants[4]))
 					<div class="img	">
@@ -268,22 +273,22 @@
 								@auth
 									@if(favouriteExist($participants[4]->id))
 										<a href="javascript:void(0)" class="favourite" data-user="{{ auth()->user()->id }}" data-participant="{{ $participants[4]->id }}" data-status="1">
-											<i class="fa fa-heart" aria-hidden="true"></i> 
+											<i class="fa fa-heart" aria-hidden="true"></i>
 										</a>
 									@else
 										<a href="javascript:void(0)" class="favourite" data-user="{{ auth()->user()->id }}" data-participant="{{ $participants[4]->id }}" data-status="0">
-											<i class="fa fa-heart-o" aria-hidden="true"></i> 
+											<i class="fa fa-heart-o" aria-hidden="true"></i>
 										</a>
-									@endif								
+									@endif
 								@else
 									<a href="{{ url('login') }}">
-										<i class="fa fa-heart-o" aria-hidden="true"></i> 
+										<i class="fa fa-heart-o" aria-hidden="true"></i>
 									</a>
 								@endauth
 							</div>
 						</a>
-					</div>	
-				@endif				
+					</div>
+				@endif
 			</div>
 			@endif
 			<hr class="divider">
@@ -338,16 +343,16 @@
 								@auth
 									@if(favouriteExist($participant->id))
 										<a href="javascript:void(0)" class="favourite" data-user="{{ auth()->user()->id }}" data-participant="{{ $participant->id }}" data-status="1">
-											<i class="fa fa-heart" aria-hidden="true"></i> 
+											<i class="fa fa-heart" aria-hidden="true"></i>
 										</a>
 									@else
 										<a href="javascript:void(0)" class="favourite" data-user="{{ auth()->user()->id }}" data-participant="{{ $participant->id }}" data-status="0">
-											<i class="fa fa-heart-o" aria-hidden="true"></i> 
+											<i class="fa fa-heart-o" aria-hidden="true"></i>
 										</a>
-									@endif								
+									@endif
 								@else
 									<a href="{{ url('login') }}">
-										<i class="fa fa-heart-o" aria-hidden="true"></i> 
+										<i class="fa fa-heart-o" aria-hidden="true"></i>
 									</a>
 								@endauth
 							</div>
@@ -434,9 +439,9 @@
 		    let input = document.getElementById('searchbar').value
 		    input=input.toLowerCase();
 		    let x = document.getElementsByClassName('search');
-		      
+
 			if (input.length > 2) {
-			    
+
 				$.ajax({
 	                type:"GET",
 	                url: '{{ url("/search") }}',
@@ -457,7 +462,7 @@
 
 								$('#list').append(`<li><a href="${url}"><div class="img"><img src="${image}" alt=""></div><div><h4>${d.name}</h4><p>Participant</p></div></a></li>`);
 							}
-							
+
 						});
 	                }
 	            });
@@ -467,17 +472,29 @@
 			}
 		}
 
-		$('.radio-input').on('click',function(){
-			var url = $(this).data('url');
-			window.location.href = url;
-		})
+		// $('.radio-input').on('click',function(){
+		// 	var url = $(this).data('url');
+		// 	window.location.href = url;
+		// })
+        $("input[type='radio'][name='join-contest']").click(function() {
+            $('#join-contest').prop('disabled',false).addClass('btn-primary').removeClass('btn-dark');
+        });
+        $('#join-contest').on('click',function(){
+            var value = $('input:radio[name=join-contest]:checked').val();
+            if(value){
+                window.location.href = value;
+            }
+            else {
+            $('#join-contest').prop('disabled',true).addClass('btn-dark').removeClass('btn-primary');
+            }
+        });
 
 		var monthlyContest = '';
 
 		$.ajax({
             type:"GET",
             url: '{{ url("/monthlyContest") }}',
-            success: function(data) 
+            success: function(data)
             {
             	//console.log(data[0]);
            		monthlyContest = data;
@@ -485,16 +502,19 @@
         });
 
         counter = 0,
-            
+
         timer = setInterval(function(){
 			codeAddress(monthlyContest[counter]);
 			counter++
 
+            if (counter > monthlyContest.length-1) {
+                counter = 0
+                }
 			if (counter > 5) {
 				counter = 0
 			}
         },3000);
-	      
+
 	    function codeAddress(record) {
 	        // console.log(record);
 
@@ -511,7 +531,7 @@
 		$.ajax({
             type:"GET",
             url: '{{ url("/annualParticipants") }}',
-            success: function(data) 
+            success: function(data)
             {
            		annualParticipants = data;
            		annual();
@@ -520,10 +540,10 @@
 
         function annual(){
 
-        	if (annualParticipants.length >= 1) 
+        	if (annualParticipants.length >= 1)
 	        {
 	        	annual_counter = 0,
-	            
+
 		        timer = setInterval(function(){
 					annualParticipant(annualParticipants[annual_counter]);
 					annual_counter++
@@ -532,7 +552,7 @@
 						annual_counter = 0
 					}
 		        },3000);
-			      
+
 			    function annualParticipant(record) {
 			        $('.annualParticipantsAnchor h4').text(`${record.name}`);
 			        $('.annualParticipantsAnchor img').attr('src', `${base_url}/storage/${record.image}`);
@@ -546,7 +566,7 @@
 		$.ajax({
             type:"GET",
             url: '{{ url("/videoParticipants") }}',
-            success: function(data) 
+            success: function(data)
             {
            		videoParticipants = data;
            		video();
@@ -555,10 +575,10 @@
 
         function video(){
 
-        	if (videoParticipants.length >= 1) 
+        	if (videoParticipants.length >= 1)
 	        {
 	        	video_counter = 0,
-	            
+
 		        timer = setInterval(function(){
 					videoParticipant(videoParticipants[video_counter]);
 					video_counter++
@@ -567,7 +587,7 @@
 						video_counter = 0
 					}
 		        },3000);
-			      
+
 			    function videoParticipant(record) {
 			        $('.videoParticipantsAnchor h4').text(`${record.name}`);
 			        $('.videoParticipantsAnchor img').attr('src', `${base_url}/storage/${record.video_thumbnail}`);
@@ -581,7 +601,7 @@
 		$.ajax({
             type:"GET",
             url: '{{ url("/monthlyParticipants") }}',
-            success: function(data) 
+            success: function(data)
             {
            		monthlyParticipants = data;
            		monthly();
@@ -590,10 +610,11 @@
 
         function monthly(){
 
-        	if (monthlyParticipants.length >= 1) 
+            console.log(monthlyParticipants.length)
+        	if (monthlyParticipants.length >= 1)
 	        {
 	        	monthly_counter = 0,
-	            
+
 		        timer = setInterval(function(){
 					monthlyParticipant(monthlyParticipants[monthly_counter]);
 					monthly_counter++
@@ -601,9 +622,11 @@
 					if (monthly_counter > monthlyParticipants.length-1) {
 						monthly_counter = 0
 					}
+                    console.log(monthly_counter)
 		        },3000);
-			      
+
 			    function monthlyParticipant(record) {
+                    console.log(record)
 			        $('.monthlyParticipantsAnchor h4').text(`${record.name}`);
 			        $('.monthlyParticipantsAnchor img').attr('src', `${base_url}/storage/${record.image}`);
 			        $('.monthlyParticipantsAnchor').attr('href', `${base_url}/participant/${record.id}`);
@@ -612,7 +635,7 @@
         }
 
         $(document).ready(function() {
-	  	
+
 	  		Shareon.init();
 		});
 

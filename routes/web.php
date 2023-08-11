@@ -1,5 +1,10 @@
 <?php
 
+use App\Mail\forgot_otp;
+use App\Mail\WelcomeMail;
+use App\Models\User;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -12,7 +17,17 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::get('/check-email', function(){
+    $user = User::first();
+    // Mail::to('muddassirizhar@gmail.com')->send(new WelcomeMail($user));
+    event(new Registered($user));
 
+    $user->update([
+        'forgot_otp' => rand(0, 9999)
+    ]);
+
+    Mail::to('muddassirizhar@gmail.com')->send(new forgot_otp($user));
+});
 Route::get('/check-fb/{slug}', function(){
 
     return view('check_fb');
@@ -22,7 +37,7 @@ Route::get('/check-fb/{slug}', function(){
 
 //     $Participants = Participant::all();
 
-//     foreach ($Participants as $key => $Participant) 
+//     foreach ($Participants as $key => $Participant)
 //     {
 //         $Participant->slug = Str::slug($Participant->name).'-'.Str::random(16);
 //         $Participant->save();

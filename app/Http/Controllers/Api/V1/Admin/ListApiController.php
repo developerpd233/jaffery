@@ -23,7 +23,7 @@ class ListApiController extends Controller
         $type = '';
 
         if ( isset($request->keyword) && isset($request->type) ) {
-        
+
             $text = $request->keyword;
             $type = $request->type;
 
@@ -44,7 +44,7 @@ class ListApiController extends Controller
 
             if ($type) {
                 $user_ids = $type->users()->pluck('id')->toArray();
-        
+
                 $participants = Participant::withCount('votes')
                     ->with('user')
                     ->whereIn('user_id', $user_ids)
@@ -54,8 +54,8 @@ class ListApiController extends Controller
             }
         }
 
-        foreach ($participants as $key => $participant) 
-        {    
+        foreach ($participants as $key => $participant)
+        {
             if(favouriteExist($participant->id))
             {
                 $participant->favourite = true;
@@ -74,11 +74,11 @@ class ListApiController extends Controller
         $results = collect();
         $text = '';
         $type = '';
-        
+
         if ( isset($request->keyword) && isset($request->type) ) {
             $text = $request->input('keyword');
             $type = $request->input('type');
-        
+
             if ($type == 'country') {
                 $results = Country::where('name', 'Like', '%'.$text.'%')->get();
             }
@@ -103,8 +103,8 @@ class ListApiController extends Controller
             ->where('start_date','<=',now()->format('Y-m-d'))
             ->where('end_date','>=',now()->format('Y-m-d'))
             ->get();
-        
-        foreach ($contests as $key => $contest) 
+
+        foreach ($contests as $key => $contest)
         {
             $participants = Participant::withCount('votes')
                 ->with('user')
@@ -114,8 +114,8 @@ class ListApiController extends Controller
                 ->take(6)
                 ->get();
 
-            foreach ($participants as $key => $participant) 
-            {    
+            foreach ($participants as $key => $participant)
+            {
                 if(favouriteExist($participant->id))
                 {
                     $participant->favourite = true;
@@ -142,13 +142,13 @@ class ListApiController extends Controller
                 ->with('user')
                 ->get();
 
-        foreach ($favourites as $key => $participant) 
-        {    
+        foreach ($favourites as $key => $participant)
+        {
             $participant->favourite = true;
             $contest = $participant->contest;
 
             if ($participant->status == 2) {
-                $part = $contest->participants()->where('status',2)->orderByDesc('position')->first(); 
+                $part = $contest->participants()->where('status',2)->orderByDesc('position')->first();
             } else {
                 $part = $contest->participants()->where('status',1)->orderByDesc('position')->first();
             }
@@ -211,7 +211,7 @@ class ListApiController extends Controller
     public function winners()
     {
         $participants = collect();
-        
+
         $contests = Contest::where('status', 1)
             ->whereHas('type', function ($q) {
                 $q->where('slug', 'monthly')->orWhere('slug', 'video');
@@ -219,7 +219,7 @@ class ListApiController extends Controller
             ->where('start_date','<=',now()->format('Y-m-d'))
             ->where('end_date','>=',now()->format('Y-m-d'))
             ->get();
-        
+
         $annual_contest = Contest::where('status', 1)
             ->whereHas('type', function ($q) {
                 $q->where('slug', 'annual');
@@ -243,7 +243,7 @@ class ListApiController extends Controller
         foreach ($contests as $key => $contest) {
 
             foreach ($month_year as $key => $my) {
-                
+
                 $my = explode('-',$my);
                 $m  = $my[0];
                 $y  = $my[1];
@@ -265,7 +265,7 @@ class ListApiController extends Controller
         }
 
         foreach ($years as $key => $y) {
-                
+
             $winner = Participant::withCount('votes')
                 ->with('user')
                 ->where('contest_id', $annual_contest->id)
@@ -279,9 +279,9 @@ class ListApiController extends Controller
                 $participants->push($winner);
             }
         }
-        
-        foreach ($participants as $key => $participant) 
-        {    
+
+        foreach ($participants as $key => $participant)
+        {
             if(favouriteExist($participant->id))
             {
                 $participant->favourite = true;

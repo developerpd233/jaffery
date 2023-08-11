@@ -45,7 +45,7 @@ class HomeApiController extends Controller
             // search the members table
             $users = User::where('name', 'Like', '%'.$text.'%')->get();
             $participants = Participant::where('name', 'Like', '%'.$text.'%')->where('status', '=', '1')->get();
-            
+
             if ($users->count() > $participants->count()) {
                 foreach ($users as $key => $val) {
                     $results->push($val);
@@ -64,9 +64,9 @@ class HomeApiController extends Controller
                 }
             }
         }
-        
+
         $res['data'] = $results;
-                
+
         return response($res, 201);
     }
 
@@ -96,13 +96,13 @@ class HomeApiController extends Controller
             // ->where('end_date','>=',now()->format('Y-m-d'))
             ->take(6)
             ->get();
-        
+
         $res['data'] = [
             'video_contest' => $video_contest,
             'annual_contest' => $annual_contest,
             'monthly_contests' => $monthly_contests,
         ];
-                
+
         return response($res, 201);
     }
 }

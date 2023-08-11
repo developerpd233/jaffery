@@ -91,9 +91,14 @@ class ContestController extends Controller
              ->toArray();
 
         $tempStr = implode(',', $feature_ids);
-        $participants = Participant::
-        // whereIn('user_id', $user_ids)
-        whereIn('id', $feature_ids)
+        // $participants = Participant::
+        // // whereIn('user_id', $user_ids)
+        // whereIn('id', $feature_ids)
+        // ->where('status', '=', '1')
+        // ->orderByRaw(DB::raw("FIELD(id, $tempStr)"))
+        // ->paginate(10);
+        $participants = Participant::whereHas('user')
+        ->whereIn('id', $feature_ids)
         ->where('status', '=', '1')
         ->orderByRaw(DB::raw("FIELD(id, $tempStr)"))
         ->paginate(10);

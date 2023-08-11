@@ -15,12 +15,12 @@
 	@auth
 			@if (!$exist)
 				<div class="alert alert-danger alert-block mt-3 flash-alert">
-					<button type="button" class="close" data-dismiss="alert">&times;</button>    
+					<button type="button" class="close" data-dismiss="alert">&times;</button>
 					<strong>This contest is not available now!</strong>
 				</div>
 			@elseif ($participant->status == 2)
 				<div class="alert alert-danger alert-block mt-3 flash-alert">
-					<button type="button" class="close" data-dismiss="alert">&times;</button>    
+					<button type="button" class="close" data-dismiss="alert">&times;</button>
 					<strong>This participant is past contest!</strong>
 				</div>
 			@endif
@@ -45,7 +45,7 @@
 	<div class="container-fluid">
 
 		<div class="lft">
-			
+
 
 			<div class="post">
 
@@ -56,16 +56,16 @@
 					@auth
 						@if(favouriteExist($participant->id))
 							<a href="javascript:void(0)" class="favourite" data-user="{{ auth()->user()->id }}" data-participant="{{ $participant->id }}" data-status="1">
-								<i class="fa fa-heart" aria-hidden="true"></i> 
+								<i class="fa fa-heart" aria-hidden="true"></i>
 							</a>
 						@else
 							<a href="javascript:void(0)" class="favourite" data-user="{{ auth()->user()->id }}" data-participant="{{ $participant->id }}" data-status="0">
-								<i class="fa fa-heart-o" aria-hidden="true"></i> 
+								<i class="fa fa-heart-o" aria-hidden="true"></i>
 							</a>
-						@endif								
+						@endif
 						@else
 							<a href="{{ url('login') }}">
-								<i class="fa fa-heart-o" aria-hidden="true"></i> 
+								<i class="fa fa-heart-o" aria-hidden="true"></i>
 							</a>
 					@endauth
 				</div>
@@ -111,15 +111,15 @@
 				$fb_url = "https://www.facebook.com/v6.0/dialog/share?app_id=439050034665686&channel_url=https%3A%2F%2Fstaticxx.facebook.com%2Fx%2Fconnect%2Fxd_arbiter%2F%3Fversion%3D46%23cb%3Df666867f02529%26domain%3Dwww.curiouspose.com%2Fparticipant%2F".$participant->id."%26is_canvas%3Dfalse%26origin%3Dhttps%253A%252F%252Fwww.curiouspose.com%2Fparticipant%2F".$participant->id."%252Ff1a1a37b7258b74%26relation%3Dopener&display=popup&e2e=%7B%7D&fallback_redirect_uri=https%3A%2F%2Fwww.curiouspose.com%2Fparticipant%2F".$participant->id."%2F&href=https%3A%2F%2Fwww.curiouspose.com%2Fparticipant%2F".$participant->id."%2F%3Fshare%3D1&locale=en_US&next=https%3A%2F%2Fstaticxx.facebook.com%2Fx%2Fconnect%2Fxd_arbiter%2F%3Fversion%3D46%23cb%3Df360a2f994f278c%26domain%3Dwww.curiouspose.com%2Fparticipant%2F".$participant->id."%26is_canvas%3Dfalse%26origin%3Dhttps%253A%252F%252Fwww.curiouspose.com%2Fparticipant%2F".$participant->id."%252Ff1a1a37b7258b74%26relation%3Dopener%26frame%3Dffed9c51f1458c%26result%3D%2522xxRESULTTOKENxx%2522&sdk=joey&version=v6.0";
 				$participant_url = "https://curiouspose.com/participant/".$participant->id;
 				//$fb_url = "https://www.facebook.com/dialog/share?app_id=439050034665686&display=popup&href=".$participant_url."&redirect_uri=".$participant_url;
-				
+
 			@endphp
 			{{-- <a class="facebook" href="{{ $u }}" target="_blank">Facebook</a> --}}
 			{{-- 8334345987-harrison --}}
 			{{-- <div class="fb-share-button" data-href="https://curiouspose.com/participant/40" data-layout="button" data-size="large"><a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fcuriouspose.com%2Fparticipant%2F40&amp;src=sdkpreparse" class="fb-xfbml-parse-ignore">Share</a></div> --}}
-			
+
 			<div class="shareon mb-5" data-title="Pose2Post" data-url="{{ $participant_url }}" data-media="{{ 'https://curiouspose.com/storage/'.$participant->image }}">
 				  {{-- <a class="facebook" data-title="Pose2Post" data-url="{{ $participant_url }}" data-media="{{ 'https://curiouspose.com/storage/'.$participant->image }}"></a> --}}
-				  <a class="facebook" href="javascript:void(0)" data-fb-url="{{ $fb_url }}" target="_blank"></a> 
+				  <a class="facebook" href="javascript:void(0)" data-fb-url="{{ $fb_url }}" target="_blank"></a>
 				  <a class="linkedin"></a>
 				  <a class="pinterest"></a>
 				  <a class="twitter"></a>
@@ -151,7 +151,7 @@
 		<!-- <form id="regForm" action="{{ route('make.payment') }}" method="POST"> -->
 		<form id="regForm" action="{{ route('authorizeDotNet') }}" method="POST">
 			@csrf
-			
+
 			<input type="hidden" name="participant_id" value="{{ $participant->id }}">
 			<input type="hidden" name="c_url" value="{{ Request::url() }}">
 
@@ -180,7 +180,7 @@
 					</li> --}}
 					<li>
 						<span class="txt">votes</span>
-						<span class="txt">{{ $participant->votes->count() }}</span>
+						<span class="txt">{{ $participant->votes()->whereHas('user')->count() }}</span>
 					</li>
 					<li>
 						<span class="txt">close time</span>
@@ -226,12 +226,12 @@
 
 			@auth
 				@if (!$exist)
-                  
+
 				@elseif ($participant->status == 2)
 
         		@else
         			<div class="vots_btn">
-						<button type="button" id="nextBtn" onclick="nextPrev(1)">Vote Now</button>	
+						<button type="button" id="nextBtn" onclick="nextPrev(1)">Vote Now</button>
 						<button type="button" id="prevBtn" onclick="nextPrev(-1)">Previous</button>
 					</div>
         		@endif
@@ -255,7 +255,7 @@
 	     			<video controls>
 			  			<source src="{{ Voyager::image($participant->video) }}">
 					</video>
-				</div>       
+				</div>
             @else
             	<h2>Photos</h2>
 				<div class="box">
@@ -304,16 +304,16 @@
 				@else
 					<img src=""/>
 				@endauth
-				
+
 			</a>
 			<textarea placeholder="Add yout comment" name="comment" id="comment" data-update="0"></textarea>
-			
+
 			@auth
 				<input type="hidden" name="status" value="auth">
 			@else
 				<input type="hidden" name="status" value="login">
 			@endauth
-			
+
 		</form>
 
 		<div class="comment" id="comments_div">
@@ -351,9 +351,9 @@
 <script src="https://cdn.jsdelivr.net/npm/shareon@2/dist/shareon.iife.js" defer init></script>
 
 <script>
-	
+
 	$(document).ready(function() {
-	  	
+
 		$('.facebook').on('click',function(e){
 			e.preventDefault();
 			var fb_url = $(this).attr('data-fb-url');
@@ -393,7 +393,7 @@
 	  	$(document).on('click','.comment .rit i',function(){
 		    $(this).next().toggle();
 		});
-		
+
 	});
 
 </script>
@@ -401,13 +401,13 @@
 <script>
 
   $(document).ready(function(){
-    
+
     $("body").on('keypress','#comment',function(event){
-      
+
       	var keycode = (event.keyCode ? event.keyCode : event.which);
 
 	    if(keycode == '13'){
-	  
+
 	  		if ($('input[name="status"]').val() == 'auth') {
 
 	  			var token   = $('meta[name="csrf-token"]').attr('content');
@@ -423,7 +423,7 @@
 			        _token: token
 			      },
 			      success: function(response) {
-			        
+
 			        console.log(response);
 
 			        if(response.code == 200) {
@@ -436,7 +436,7 @@
 			          	}else{
 			          		var image = base_url+'/storage/'+user.avatar;
 			          	}
-			          	
+
 
 			          	$('#comment').val('');
 			            $('#comments_div').append(`<div class="box">
@@ -455,8 +455,8 @@
 								</ul>
 							</div>
 						</div>`);
-					    
-					    $('.toast .toast-body').empty().html(response.message);    
+
+					    $('.toast .toast-body').empty().html(response.message);
 			            $('.toast').toast('show');
 			        }
 			      },
@@ -465,16 +465,16 @@
 			      }
 			    });
 
-	  		} 
+	  		}
 	  		else {
 	  			window.location.href = '{{ url("login") }}';
-	  		}      
+	  		}
 	    }
     });
 
 	$("body").on('click','.delete_comment',function(e){
 	    e.preventDefault();
-	    
+
 	    var token   = $('meta[name="csrf-token"]').attr('content');
 	    var url = '{{ url("/comments/") }}'+ '/' + $(this).data('id');
 	    var box = $(this).parent().parent().parent().parent();
@@ -489,7 +489,7 @@
 	        if(response.code == 200) {
 	        	console.log('delete');
 	        	box.remove();
-	        	$('.toast .toast-body').empty().html(response.message);    
+	        	$('.toast .toast-body').empty().html(response.message);
 		        $('.toast').toast('show');
 	        }
 	      },
@@ -503,7 +503,7 @@
 
   	$("body").on('click','.edit_comment',function(e){
 	    e.preventDefault();
-	    
+
 	    var left = $(this).parent().parent().parent().siblings('.lft');
 	    var id = $(this).data('id');
 	    var comment = left.children('p').text();
@@ -513,12 +513,12 @@
   	});
 
   	$("body").on('keypress','#edit_comment',function(event){
-      
+
       	var element = $(this);
       	var keycode = (event.keyCode ? event.keyCode : event.which);
 
 	    if(keycode == '13'){
-	  
+
 	    		var token   = $('meta[name="csrf-token"]').attr('content');
 			    var comment = $('#edit_comment').val();
 			    var update_id   = $('#edit_comment').data('id');
@@ -535,7 +535,7 @@
 				        _method: 'PATCH'
 				      },
 				      success: function(response) {
-				        
+
 				        console.log(response);
 
 				        if(response.code == 200) {
@@ -543,7 +543,7 @@
 				        	element.parent().append(`<p>${comment}</p>`);
 						    element.remove();
 
-						    $('.toast .toast-body').empty().html(response.message);    
+						    $('.toast .toast-body').empty().html(response.message);
 				            $('.toast').toast('show');
 				        }
 				      },

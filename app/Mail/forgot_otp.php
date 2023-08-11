@@ -29,9 +29,10 @@ class forgot_otp extends Mailable
     public function build()
     {
 
-        return $this->from('info@areuoneinamillion.com')
-               ->subject('Pose2Post OTP verification')
-               ->view('email.forgot_otp',["user"=>$this->user,"title"=>"Register"]);
+        // return $this->from('info@areuoneinamillion.com')
+        //        ->subject('Pose2Post OTP verification')
+        //        ->view('email.forgot_otp',["user"=>$this->user,"title"=>"Register"]);
+        return $this->subject('Pose2Post OTP verification')->view('email.forgot_otp',["user"=>$this->user,"title"=>"Register"]);
 
     }
 }

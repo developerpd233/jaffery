@@ -4,7 +4,7 @@
 @section('css')
 
 <style>
-    
+
     .container {
       width: 500px;
       margin: 25px auto;
@@ -81,7 +81,7 @@
                     <div class="container">
                       <form action="#" name="payment">
                         <h1 class="title" style="text-align: center;">Authorize.net</h1>
-                        
+
                         <div style="text-align:left;">
 	                        <br><br>
 	                        <label for="amount">Amount</label>
@@ -126,7 +126,8 @@
 
                         </div>
                         <br>
-                        <button type="submit" id="submit-btn">Submit</button>
+                        <div class="g-recaptcha" data-sitekey="6LfLsZQmAAAAAFY-dvtdYnh-1Rc0-RFEtniE4hFe" data-callback="enableBtn"></div>
+                        <button type="submit" id="submit-btn"  disabled="disabled">Submit</button>
                       </form>
                       <!-- <input type="button" name="btn_auth" id="btn_auth" value="Authorize"> -->
                     </div>
@@ -140,7 +141,9 @@
 @endsection
 
 @section('script')
-
+<script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit"
+    async defer>
+</script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js"></script>
 
 		<script>
@@ -164,7 +167,10 @@
       //       alert('dsfs');
       //       authorizeDotNet();
       //   });
-
+        function enableBtn(){
+            // document.getElementById("submit-btn").disabled = false;
+            $("#submit-btn").attr('disabled', false);
+        }
         function authorizeDotNet() {
 
             $("#submit-btn").attr('disabled', true);
@@ -191,8 +197,8 @@
             var myData = `{
                             "createTransactionRequest": {
                                 "merchantAuthentication": {
-                                    "name": "3qPKmzB5Dg9X",
-                                    "transactionKey": "5EeL82XS8mw4T83t"
+                                    "name": "5p79CKt4dr2",
+                                    "transactionKey": "57Gs6N6462y5HaG3"
                                 },
                                 "refId": "${refId}",
                                 "transactionRequest": {
@@ -239,11 +245,11 @@
                                      "originalNetworkTransId": "123456789NNNH",
                                      "originalAuthAmount": "${amount}",
                                      "reason": "resubmission"
-                                    },          
+                                    },
                                     "authorizationIndicatorType": {
                                     "authorizationIndicator": "pre"
                                   }
-                         
+
                                }
                             }
                         }`;
@@ -276,27 +282,27 @@
 
             //test end
 
-            $.ajax({                                                                        
-                type: 'POST',        
-                contentType: 'application/json',                                                                       
-                url: 'https://api.authorize.net/xml/v1/request.api',                    
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json',
+                url: 'https://api.authorize.net/xml/v1/request.api',
                 data: myData,
-                dataType: 'json',                                                               
+                dataType: 'json',
                 success: function (res) {
-                    
+
                     console.log('Response: ',res,res.messages.resultCode,res.messages.message[0].text);
                     //return;
-                    if (res != '') {                                                                  
-                        if (res.messages.resultCode != "Error") {                                                        
-                            //console.log('Success: Successful-',res.transactionResponse.transId);  
+                    if (res != '') {
+                        if (res.messages.resultCode != "Error") {
+                            //console.log('Success: Successful-',res.transactionResponse.transId);
 
-                            if (typeof(res.transactionResponse.errors) != "undefined" && res.transactionResponse.errors !== null) 
+                            if (typeof(res.transactionResponse.errors) != "undefined" && res.transactionResponse.errors !== null)
                             {
                             	alert(res.transactionResponse.errors[0].errorText+' Kindly check your bill details are correct!');
                             	$("#submit-btn").attr('disabled', false);
                             	return;
-                            } 
-                            else 
+                            }
+                            else
                             {
                           		$.ajax({
 													      url: base_url+'/authorizeDotNet-success',
@@ -319,25 +325,25 @@
 													        console.log(response);
 													        $("#submit-btn").attr('disabled', false);
 													      }
-													    });			
+													    });
                             }
 
-                        }                                                                               
-                        else {                                                                               
+                        }
+                        else {
                             //console.log('Error: Handshake Unsuccessful');
                             alert(res.messages.message[0].text);
                             $("#submit-btn").attr('disabled', false);
-                        }                                                                                                      
-                    }                                                                               
-                    else {                                                                               
-                        console.log('Error: Handshake Unsuccessful 1');     
-                        $("#submit-btn").attr('disabled', false);                                   
-                    }                                                                                                  
-                },                                                                              
-                error: function (error) {                                                       
-                    console.log('Error: An error occurred',error);   
-                    $("#submit-btn").attr('disabled', false);                                 
-                },                                                                              
+                        }
+                    }
+                    else {
+                        console.log('Error: Handshake Unsuccessful 1');
+                        $("#submit-btn").attr('disabled', false);
+                    }
+                },
+                error: function (error) {
+                    console.log('Error: An error occurred',error);
+                    $("#submit-btn").attr('disabled', false);
+                },
             });
 
         }
@@ -464,14 +470,14 @@
                 authorizeDotNet();
             }
           });
-      
+
         $.validator.addMethod("future", function(value, element) {
-            
+
             var temp = value.split('/');
             temp = temp[0]+'/30/'+temp[1];
             var curDate = new Date();
             var inputDate = new Date(temp);
-            
+
             if (inputDate > curDate)
                 return true;
             return false;
@@ -479,11 +485,11 @@
         }, "Please add future date!");
 
         $.validator.addMethod("dateFormat", function(value, element) {
-            
-            var pattern = new RegExp(/\b\d{1,2}[\/]\d{4}\b/); 
-            return pattern.test(value); 
 
-        }, "Please add correct format! Date format is 12/2025"); 
+            var pattern = new RegExp(/\b\d{1,2}[\/]\d{4}\b/);
+            return pattern.test(value);
+
+        }, "Please add correct format! Date format is 12/2025");
 
         function makeid(length) {
             var result           = '';
@@ -494,15 +500,15 @@
             }
             return result;
         }
-        
+
     </script>
-				
+
 <script>
-	
+
 	$(document).ready(function() {
-	  	
+
   	var amount = $('#amount').val();
-		
+
 		$('ul h3').empty().text('YOU VOTED AMOUNT $' + amount);
 
   	$('#amount').on('change',function(){
@@ -517,20 +523,20 @@
   	$(document).on('click','.comment .rit i',function(){
 	    $(this).next().toggle();
 		});
-		
+
 	});
 
 </script>
 
 <!-- <script>
-	
+
 				$(document).ready(function() {
-				  	
+
 				  	var pro = <?php echo json_encode($product); ?>;
 				  	var req_info = <?php echo json_encode($req_info); ?>;
 
 				  	console.log(pro,req_info);
-					
+
 				});
 
 			</script> -->
@@ -578,11 +584,11 @@
               onApprove: (data, actions) => {
                   const captureOrderHandler = (details) => {
                       const payerName = details.payer.name.given_name;
-                      
+
                       console.log(details);
                       console.log(details.ammar);
 
-                      if (details.status == 'COMPLETED') 
+                      if (details.status == 'COMPLETED')
                       {
 
 										    $.ajax({
@@ -605,7 +611,7 @@
 										    });
 
                       	console.log('Transaction completed');
-                      } 
+                      }
                       else {
                       	alert('Transaction not completed. Please try again later!');
                       }

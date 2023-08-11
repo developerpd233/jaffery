@@ -56,7 +56,7 @@ class ParticipantController extends Controller
     public function store(Request $request)
     {
         //dd($request);
-        
+
         // if (participantExist($request->contest_id)) {
         //     return back()->with('error' , 'You already participated in this contest!');
         // }
@@ -71,7 +71,7 @@ class ParticipantController extends Controller
             'images' => 'nullable|array|min:1|max:5',
             'video' => 'required_with:video_thumbnail|mimes:mp4,mov,ogg,qt,ogx,oga,ogv,webm|max:20000',
             'video_thumbnail' => 'nullable|array|min:1|max:1',
-        ]);  
+        ]);
 
         //dd($request);
 
@@ -86,20 +86,20 @@ class ParticipantController extends Controller
             $rand = md5(microtime());
             $image       = $request->file('video_thumbnail')[0];
             $filename    = $rand.'.'.$image->getClientOriginalExtension();
-            $filepath_video_thumbnail = '/participants/'.date('FY').'/'.$filename;      
-            
+            $filepath_video_thumbnail = '/participants/'.date('FY').'/'.$filename;
+
             $image_resize = Image::make($image);
 
             $image_resize->save('storage/app/public/participants/'.date('FY').'/'.$filename);
         }
 
         if ($request->has('video')) {
-            
+
             $rand = md5(microtime());
             $video      = $request->file('video');
             $filename_video    = $rand.'.'.$video->getClientOriginalExtension();
-            $filepath_video = '/participants/'.date('FY').'/'.$filename_video;      
-            
+            $filepath_video = '/participants/'.date('FY').'/'.$filename_video;
+
             $path = 'storage/app/public/participants/'.date('FY').'/';
             $video->move($path, $filename_video);
         }
@@ -113,8 +113,8 @@ class ParticipantController extends Controller
             $rand = md5(microtime());
             $image       = $request->file('image')[0];
             $filename    = $rand.'.'.$image->getClientOriginalExtension();
-            $filepath = '/participants/'.date('FY').'/'.$filename;      
-            
+            $filepath = '/participants/'.date('FY').'/'.$filename;
+
             $image_resize = Image::make($image);
 
             $image_resize->save('storage/app/public/participants/'.date('FY').'/'.$filename);
@@ -128,11 +128,11 @@ class ParticipantController extends Controller
             $image = str_replace(' ', '+', $image);
             $filename = $rand.'.'.'webp';
 
-            $filepath = '/participants/'.date('FY').'/'.$filename;      
+            $filepath = '/participants/'.date('FY').'/'.$filename;
             $image_resize = Image::make($image);
             $image_resize->save('storage/app/public/participants/'.date('FY').'/'.$filename);
         }
-        
+
         $files = $request->file('images');
 
         if($request->hasFile('images'))
@@ -141,7 +141,7 @@ class ParticipantController extends Controller
                 $rand = md5(microtime());
                 $image       = $file;
                 $filename    = $rand.'.'.$image->getClientOriginalExtension();
-                $filepaths = '/participants/'.date('FY').'/'.$filename;      
+                $filepaths = '/participants/'.date('FY').'/'.$filename;
                 $image_resize = Image::make($image);
                 $image_resize->save('storage/app/public/participants/'.date('FY').'/'.$filename);
                 array_push( $filePathArr , $filepaths );
@@ -156,7 +156,7 @@ class ParticipantController extends Controller
                 $image = str_replace(' ', '+', $image);
                 $filename = $rand.'.'.'webp';
 
-                $filepaths = '/participants/'.date('FY').'/'.$filename;      
+                $filepaths = '/participants/'.date('FY').'/'.$filename;
                 $image_resize = Image::make($image);
                 $image_resize->save('storage/app/public/participants/'.date('FY').'/'.$filename);
                 array_push( $filePathArr , $filepaths );
@@ -168,7 +168,7 @@ class ParticipantController extends Controller
         $data = $request->all();
 
         //dd($filepath,$data);
-        
+
         $participant = Participant::create([
             'user_id' => auth()->user()->id,
             'contest_id' => $data['contest_id'],
@@ -211,7 +211,7 @@ class ParticipantController extends Controller
 
             return redirect(route('participant.show',$participant->id))->with('success' , 'You are participated successfully.');
         }
-        
+
         return back()->with('error' , 'Please try again. Something went wrong!');
     }
 
@@ -224,8 +224,8 @@ class ParticipantController extends Controller
         $rand = md5(microtime());
         $video      = $request->file('data');
         $filename_video    = $rand.'.'.'webm';
-        $filepath_video = '/participants/'.date('FY').'/'.$filename_video;      
-        
+        $filepath_video = '/participants/'.date('FY').'/'.$filename_video;
+
         $path = 'storage/app/public/participants/'.date('FY').'/';
         $video->move($path, $filename_video);
 
@@ -251,7 +251,7 @@ class ParticipantController extends Controller
         //dd($participant);
 
         $comments = $participant->comments()->get();
-        $voters = $participant->votes()->latest()->take(5)->get();
+        $voters = $participant->votes()->whereHas('user')->latest()->take(5)->get();
         $images = $participant->images;
         $images = json_decode($images, true);
         $exist = Contest::where('id', $participant->contest->id)
@@ -273,7 +273,7 @@ class ParticipantController extends Controller
     public function edit($id)
     {
         $participant = Participant::findOrFail($id);
-        
+
         if (auth()->user()->id != $participant->user->id) {
             abort(404);
         }
@@ -298,7 +298,7 @@ class ParticipantController extends Controller
     public function update(Request $request, $id)
     {
         //dd($request);
-        
+
         // if (participantExist($request->contest_id)) {
         //     return back()->with('error' , 'You already participated in this contest!');
         // }
@@ -312,7 +312,7 @@ class ParticipantController extends Controller
             'image' => 'nullable|array|min:1|max:1',
             'images' => 'nullable|array|min:1|max:5',
             'video' => 'nullable|mimes:mp4,mov,ogg,qt,ogx,oga,ogv,webm|max:20000',
-        ]);  
+        ]);
 
         //dd($request->file('image')[0]);
 
@@ -322,12 +322,12 @@ class ParticipantController extends Controller
         $filePathArr = [];
 
         if ($request->has('video')) {
-            
+
             $rand = md5(microtime());
             $video      = $request->file('video');
             $filename_video    = $rand.'.'.$video->getClientOriginalExtension();
-            $filepath_video = '/participants/'.date('FY').'/'.$filename_video;      
-            
+            $filepath_video = '/participants/'.date('FY').'/'.$filename_video;
+
             $path = 'storage/app/public/participants/'.date('FY').'/';
             $video->move($path, $filename_video);
         }
@@ -337,8 +337,8 @@ class ParticipantController extends Controller
             $rand = md5(microtime());
             $image       = $request->file('image')[0];
             $filename    = $rand.'.'.$image->getClientOriginalExtension();
-            $filepath = '/participants/'.date('FY').'/'.$filename;      
-            
+            $filepath = '/participants/'.date('FY').'/'.$filename;
+
             $image_resize = Image::make($image);
 
             $image_resize->save('storage/app/public/participants/'.date('FY').'/'.$filename);
@@ -352,11 +352,11 @@ class ParticipantController extends Controller
             $image = str_replace(' ', '+', $image);
             $filename = $rand.'.'.'webp';
 
-            $filepath = '/participants/'.date('FY').'/'.$filename;      
+            $filepath = '/participants/'.date('FY').'/'.$filename;
             $image_resize = Image::make($image);
             $image_resize->save('storage/app/public/participants/'.date('FY').'/'.$filename);
         }
-        
+
         $files = $request->file('images');
 
         if($request->hasFile('images'))
@@ -365,7 +365,7 @@ class ParticipantController extends Controller
                 $rand = md5(microtime());
                 $image       = $file;
                 $filename    = $rand.'.'.$image->getClientOriginalExtension();
-                $filepaths = '/participants/'.date('FY').'/'.$filename;      
+                $filepaths = '/participants/'.date('FY').'/'.$filename;
                 $image_resize = Image::make($image);
                 $image_resize->save('storage/app/public/participants/'.date('FY').'/'.$filename);
                 array_push( $filePathArr , $filepaths );
@@ -380,7 +380,7 @@ class ParticipantController extends Controller
                 $image = str_replace(' ', '+', $image);
                 $filename = $rand.'.'.'webp';
 
-                $filepaths = '/participants/'.date('FY').'/'.$filename;      
+                $filepaths = '/participants/'.date('FY').'/'.$filename;
                 $image_resize = Image::make($image);
                 $image_resize->save('storage/app/public/participants/'.date('FY').'/'.$filename);
                 array_push( $filePathArr , $filepaths );
@@ -392,7 +392,7 @@ class ParticipantController extends Controller
         $data = $request->all();
 
         //dd($filepath,$data);
-        
+
         $participant = Participant::create([
             'user_id' => auth()->user()->id,
             'contest_id' => $data['contest_id'],
@@ -407,7 +407,7 @@ class ParticipantController extends Controller
         if ($participant) {
             return redirect(route('participant.show',$participant->id))->with('success' , 'You are participated successfully.');
         }
-        
+
         return back()->with('error' , 'Please try again. Something went wrong!');
     }
 
@@ -424,7 +424,7 @@ class ParticipantController extends Controller
 
     public function participate($id)
     {
-        
+
 
         $contest = Contest::find($id);
 
@@ -442,7 +442,7 @@ class ParticipantController extends Controller
         // $this->validate($request, [
         //     'name' => 'required|max:100',
         //     'detail' => 'required|max:2000',
-        // ]);  
+        // ]);
 
         $participant = Participant::findOrFail($request->participant_id);
         $contest = $participant->contest;
@@ -464,9 +464,9 @@ class ParticipantController extends Controller
         $contest->amount = $contest->amount + $contest_amount;
         $contest->save();
 
-        // $contest->amount = $contest->amount + $contest_amount 
+        // $contest->amount = $contest->amount + $contest_amount
         // $contest->save();
-        
+
         // dd('sd');
 
         $vote = Vote::create([
@@ -479,7 +479,7 @@ class ParticipantController extends Controller
         if ($vote) {
             return back()->with('success' , 'You are voted successfully.');
         }
-        
+
         return back()->with('error' , 'Please try again. Something went wrong!');
     }
 
@@ -512,28 +512,28 @@ class ParticipantController extends Controller
                 'qty' => 1
             ]
         ];
-  
+
         $product['invoice_id'] = Str::random(16);
         $product['invoice_description'] = "Order #{$product['invoice_id']} Bill";
         $product['return_url'] = route('success.payment');
         $product['cancel_url'] = route('cancel.payment');
         $product['total'] = $request->amount;
-  
+
         $paypalModule = new ExpressCheckout;
-  
+
         $res = $paypalModule->setExpressCheckout($product);
         $res = $paypalModule->setExpressCheckout($product, true);
-  
+
         return redirect($res['paypal_link']);
     }
-   
+
     public function paymentCancel()
     {
         $info = Session::get('req_info');
-        
+
         return redirect(route('participant.show',$info[0]['participant_id']))->with('error' , 'Your payment has been declined. Please try again!');
     }
-  
+
     public function paymentSuccess(Request $request)
     {
         $info = Session::get('req_info');
@@ -553,7 +553,7 @@ class ParticipantController extends Controller
         elseif ($contest->type->slug == 'video') {
             $kitty = ( $amount / 100 ) * 57;
             $contest_amount = $amount - $kitty;
-        } 
+        }
         else {
             $count = Vote::where('contest_id',$contest->id)->where('user_id',auth()->user()->id)->count();
 
@@ -564,7 +564,7 @@ class ParticipantController extends Controller
                 $kitty = 0;
                 $contest_amount = $amount;
             }
-        }        
+        }
 
         // $amount = $info[0]['amount'];
         // $contest_amount = ($amount / 100) * 67;
@@ -587,7 +587,7 @@ class ParticipantController extends Controller
         }
 
         if (in_array(strtoupper($response['ACK']), ['SUCCESS', 'SUCCESSWITHWARNING'])) {
-            
+
             $vote = Vote::create([
                 'user_id' => auth()->user()->id,
                 'contest_id' => $contest->id,
@@ -606,16 +606,16 @@ class ParticipantController extends Controller
                     'transaction_token' => $response['TOKEN']
                 ]);
 
-                try 
+                try
                 {
-                    
+
                     Mail::to('theoflas@yahoo.com')->send(new TransactionMail($transaction,auth()->user(),$participant,$participant->contest));
 
                     Mail::to(auth()->user()->email)->send(new TransactionMail($transaction,auth()->user(),$participant,$participant->contest));
-                    
+
                 }
                 catch (\Throwable $th) {
-                   
+
                 }
 
                 $vote->transaction_id = $transaction->id;
@@ -645,19 +645,19 @@ class ParticipantController extends Controller
                 // $other_prize = $others_prize / $participants_count;
 
                 foreach ($participants as $key => $participant) {
-                    
+
                     if ($key == 0) {
                         $participant->amount = $first_prize;
                     }
                     else{
-                        $participant->amount = 0;   
+                        $participant->amount = 0;
                     }
                     // else if ($key == 1) {
                     //     $participant->amount = $second_prize;
-                    // } 
+                    // }
                     // else if ($key == 2) {
                     //     $participant->amount = $third_prize;
-                    // } 
+                    // }
                     // else {
                     //     $participant->amount = $other_prize;
                     // }
@@ -667,7 +667,7 @@ class ParticipantController extends Controller
 
                 return redirect(route('participant.show',$info[0]['participant_id']))->with('success' , 'You are voted successfully.');
             }
-            
+
             return redirect(route('participant.show',$participant->id))->with('error' , 'Something went wrong in voting!');
         }
 
@@ -678,7 +678,7 @@ class ParticipantController extends Controller
             'amount' => $info[0]['amount'],
             'transaction_token' => $response['TOKEN']
         ]);
-  
+
         return redirect(route('participant.show',$participant->id))->with('error' , 'Please try again. Something went wrong!');
     }
 
@@ -688,14 +688,14 @@ class ParticipantController extends Controller
             ->where('start_date','<=',now()->format('Y-m-d'))
             ->where('end_date','>=',now()->format('Y-m-d'))
             ->get();
-        
+
         return view('participants.contestants',compact('contests'));
     }
 
     public function winners()
     {
         $participants = collect();
-        
+
         $contests = Contest::where('status', 1)
             ->whereHas('type', function ($q) {
                 $q->where('slug', 'monthly')->orWhere('slug', 'video');
@@ -703,7 +703,7 @@ class ParticipantController extends Controller
             ->where('start_date','<=',now()->format('Y-m-d'))
             ->where('end_date','>=',now()->format('Y-m-d'))
             ->get();
-        
+
         $annual_contest = Contest::where('status', 1)
             ->whereHas('type', function ($q) {
                 $q->where('slug', 'annual');
@@ -727,7 +727,7 @@ class ParticipantController extends Controller
         foreach ($contests as $key => $contest) {
 
             foreach ($month_year as $key => $my) {
-                
+
                 $my = explode('-',$my);
                 $m  = $my[0];
                 $y  = $my[1];
@@ -749,7 +749,7 @@ class ParticipantController extends Controller
         }
 
         foreach ($years as $key => $y) {
-                
+
             $winner = Participant::withCount('votes')
                 ->with('user')
                 ->where('contest_id', $annual_contest->id)
@@ -763,9 +763,9 @@ class ParticipantController extends Controller
                 $participants->push($winner);
             }
         }
-        
+
         $participants = $participants->sortBy('created_at',SORT_REGULAR,true);
-        
+
         return view('participants.winners',compact('participants'));
     }
 
@@ -789,7 +789,7 @@ class ParticipantController extends Controller
     public function authorizeDotNet(Request $request)
     {
         //dd($request);
-        
+
         $participant = Participant::findOrFail($request->participant_id);
         $contest = $participant->contest;
         $req_info = $request->all();
@@ -817,15 +817,15 @@ class ParticipantController extends Controller
                 'email' => auth()->user()->email,
             ]
         ];
-  
+
         $product['invoice_id'] = Str::random(16);
         $product['invoice_description'] = "Order #{$product['invoice_id']} Bill";
         $product['return_url'] = route('success.payment');
         $product['cancel_url'] = route('cancel.payment');
         $product['total'] = $request->amount;
-  
+
         // $paypalModule = new ExpressCheckout;
-  
+
         // $res = $paypalModule->setExpressCheckout($product);
         // $res = $paypalModule->setExpressCheckout($product, true);
 
@@ -853,7 +853,7 @@ class ParticipantController extends Controller
         elseif ($contest->type->slug == 'video') {
             $kitty = ( $amount / 100 ) * 57;
             $contest_amount = $amount - $kitty;
-        } 
+        }
         else {
             $count = Vote::where('contest_id',$contest->id)->where('user_id',auth()->user()->id)->count();
 
@@ -864,7 +864,7 @@ class ParticipantController extends Controller
                 $kitty = 0;
                 $contest_amount = $amount;
             }
-        }        
+        }
 
         $company_amount = $kitty;
 
@@ -883,7 +883,7 @@ class ParticipantController extends Controller
             ]);
         }
 
-        
+
         $vote = Vote::create([
             'user_id' => auth()->user()->id,
             'contest_id' => $contest->id,
@@ -902,16 +902,16 @@ class ParticipantController extends Controller
                 'transaction_token' => $request->order_id
             ]);
 
-            try 
+            try
             {
-                
+
                 // Mail::to('theoflas@yahoo.com')->send(new TransactionMail($transaction,auth()->user(),$participant,$participant->contest));
 
                 Mail::to(auth()->user()->email)->send(new TransactionMail($transaction,auth()->user(),$participant,$participant->contest));
-                
+
             }
             catch (\Throwable $th) {
-               
+
             }
 
             $vote->transaction_id = $transaction->id;
@@ -935,14 +935,14 @@ class ParticipantController extends Controller
             $first_prize = $contest_amount;
 
             foreach ($participants as $key => $participant) {
-                
+
                 if ($key == 0) {
                     $participant->amount = $first_prize;
                 }
                 else{
-                    $participant->amount = 0;   
+                    $participant->amount = 0;
                 }
-                
+
                 $participant->position = $key + 1;
                 $participant->save();
             }
@@ -952,9 +952,9 @@ class ParticipantController extends Controller
             return response()->json(['code'=>200, 'message'=>'Vote submitted successfully','url' => route('participant.show',$info[0]['participant_id'])], 200);
             //return redirect(route('participant.show',$info[0]['participant_id']))->with('success' , 'You are voted successfully.');
         }
-        
+
         Session::flash('error', 'Something went wrong in voting!');
-        
+
         return response()->json(['code'=>404, 'message'=>'Something went wrong in voting!'], 200);
         //return redirect(route('participant.show',$participant->id))->with('error' , 'Something went wrong in voting!');
 

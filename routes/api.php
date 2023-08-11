@@ -24,7 +24,7 @@ Route::post('v1/register-otp-check', 'App\Http\Controllers\Api\V1\Admin\AuthApiC
 Route::post('v1/forgot-password-reset', 'App\Http\Controllers\Api\V1\Admin\AuthApiController@forgotPasswordreset');
 Route::post('v1/reset-password', 'App\Http\Controllers\Api\V1\Admin\AuthApiController@reset');
 Route::post('v1/check-email', 'App\Http\Controllers\Api\V1\Admin\AuthApiController@checkEmail');
-Route::post('v1/check-phone', 'App\Http\Controllers\Api\V1\Admin\AuthApiController@checkPhone');
+// Route::post('v1/check-phone', 'App\Http\Controllers\Api\V1\Admin\AuthApiController@checkPhone');
 
 
 // Home
@@ -36,7 +36,7 @@ Route::get('v1/contests-by-type/{type}', 'App\Http\Controllers\Api\V1\Admin\Cont
 Route::get('v1/contest-search', 'App\Http\Controllers\Api\V1\Admin\ContestApiController@search');
 
 // Listings
-Route::get('v1/search', 'App\Http\Controllers\Api\V1\Admin\ListApiController@search');
+Route::get('v1/list/search', 'App\Http\Controllers\Api\V1\Admin\ListApiController@search');
 
 // Page
 Route::get('v1/page/{id}', 'App\Http\Controllers\Api\V1\Admin\PageApiController@show');
@@ -48,7 +48,7 @@ Route::get('v1/location/city/{id}', 'App\Http\Controllers\Api\V1\Admin\LocationA
 Route::get('v1/location/profession', 'App\Http\Controllers\Api\V1\Admin\LocationApiController@profession');
 
 Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Controllers\Api\V1\Admin', 'middleware' => ['auth:sanctum']], function () {
-    
+
     Route::post('logout', 'AuthApiController@logout');
 
     Route::get('single-contest/{id}', 'ContestApiController@show');
@@ -73,8 +73,8 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Control
     Route::post('participant/vote', 'ParticipantApiController@vote');
     Route::get('participants/{id}', 'ParticipantApiController@show');
 
-    // Vote
-    Route::apiResource('votes', 'VoteApiController');
+    // // Vote
+    // Route::apiResource('votes', 'VoteApiController');
 
     // Comment
     Route::apiResource('comments', 'CommentApiController');
